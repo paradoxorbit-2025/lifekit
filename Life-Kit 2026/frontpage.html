@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>LifeKit</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- INTRO -->
+  <div id="intro">
+    <div id="intro-inner">
+      <div class="intro-cross">🚨</div>
+      <div class="intro-title">LifeKit</div>
+      <div class="intro-tagline">Your Survival Guide</div>
+      <div class="intro-bar"></div>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="app">
+    <div class="header">
+      <div class="header-top">
+        <div class="logo-row">
+          <div class="logo-icon">🛡️</div>
+          <div class="logo-text">LifeKit</div>
+        </div>
+        <div class="header-badge">Online</div>
+      </div>
+      <div class="header-sub">
+        <h1>Stay Safe.<br>Stay Ready.</h1>
+        <p>Emergency knowledge, always with you.</p>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <span>🔍</span>
+      <input type="text" placeholder="Search topics..." />
+    </div>
+
+    <div class="section-label">Quick Access</div>
+
+    <div class="cards-grid">
+
+      <a class="card red" href="firstaid-1.html">
+        <div class="card-icon">🩹</div>
+        <div class="card-label">First Aid</div>
+        <div class="card-desc">CPR, bleeding, burns & more</div>
+      </a>
+
+      <a class="card orange" href="emergency-1.html">
+        <div class="card-icon">🚨</div>
+        <div class="card-label">Emergency</div>
+        <div class="card-desc">Fire, flood, accidents & crisis</div>
+      </a>
+
+      <a class="card yellow" href="safety.html">
+        <div class="card-icon">🛡️</div>
+        <div class="card-label">Basic Safety</div>
+        <div class="card-desc">Daily precautions & prevention</div>
+      </a>
+
+      <a class="card green" href="rights.html">
+        <div class="card-icon">⚖️</div>
+        <div class="card-label">Basic Rights</div>
+        <div class="card-desc">Know your legal rights</div>
+      </a>
+
+      <a class="card panic" onclick="openPanic()">
+        <div class="card-icon">🆘</div>
+        <div class="panic-info">
+          <div class="card-label">Panic Button</div>
+          <div class="card-desc">Immediate help — tap in emergency</div>
+        </div>
+        <div class="panic-arrow">→</div>
+      </a>
+
+    </div>
+
+    <div class="bottom-strip">
+      <div class="strip-dot"></div>
+      <div class="strip-text"><b>100% Safe.</b> Powered by Harshit Group of Technology </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+
+  <!-- ══════════════════════════════════════════
+       LIFEKIT CHATBOT
+  ══════════════════════════════════════════ -->
+
+  <!-- Toggle Button -->
+  <button id="chat-toggle" aria-label="Open chatbot">
+    <svg class="icon-chat" viewBox="0 0 24 24"><path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm-2 10H6v-2h12v2zm0-4H6V6h12v2z"/></svg>
+    <svg class="icon-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    <span class="cb-notif-dot" id="cb-notif-dot"></span>
+  </button>
+
+  <!-- Chat Window -->
+  <div id="chat-window" role="dialog" aria-label="LifeKit Chatbot">
+
+    <!-- Header -->
+    <div class="cb-header">
+      <div class="cb-header-avatar">🛡️</div>
+      <div class="cb-header-info">
+        <h3>LifeKit Assistant</h3>
+        <span><span class="cb-online-dot"></span>Online · Ready to help</span>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div id="cb-messages"></div>
+
+    <!-- Options -->
+    <div id="cb-options">
+      <p class="cb-opts-label">Choose an option</p>
+      <div class="cb-opts-grid" id="cb-opts-grid"></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="cb-footer">
+      <button id="cb-back-btn" disabled>
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        Back
+      </button>
+      <span class="cb-footer-brand">LifeKit</span>
+    </div>
+  </div>
+
+  <script>
+  /* ════════════════════════════════════════════════════
+     CHATBOT DATA — add new topics here freely
+  ════════════════════════════════════════════════════ */
+  const CB_TREE = {
+    root: {
+      message: "What kind of help do you need today?",
+      options: ["First Aid", "Safety Tips", "Emergency Help", "Basic-Rights"]
+    },
+
+    /* First Aid */
+    "First Aid": { message: "Which first aid topic?", options: ["Cardiac", "Wounds", "Breathing", "Trauma", "Bites", "Medical","Neuro", "Electric Shock First-Aid", "Smoke Inhalation"] },
+
+    /* Cardiac */
+    "Cardiac":  { description: "Use the FAST method — Face, Arms, Speech, Time. Every minute counts in a stroke emergency.", link: "firstaid-1.html?tab=cardiac", btnText: "View Steps →" },
+   
+    /* Wounds */
+    "Wounds": { description: "Learn how to clean and dress cuts and scrapes to prevent infection.", link: "firstaid-1.html?tab=wounds", btnText: "View Steps →" },
+
+    /* Breathing */
+    "Breathing": { description: "Learn how to help someone having an asthma attack when an inhaler isn't enough.", link: "firstaid-1.html?tab=breathing", btnText: "View Steps →" },
+
+    /* Trauma */
+    "Trauma": { description: "Spinal injuries require extreme care — learn what to do and what NOT to do.", link: "firstaid-1.html?tab=trauma", btnText: "View Steps →" },
+
+    /* Bites */
+    "Bites": { description: "Bee stings and insect bites can cause allergic reactions — know how to respond.", link: "firstaid-1.html?tab=bites", btnText: "View Steps →" },
+
+    /* Medical */
+    "Medical": { description: "Poisoning needs immediate action. Know what to do — and what NOT to do.", link: "firstaid-1.html?tab=medical", btnText: "View Steps →" },
+
+    /* Neuro */
+    "Neuro": { description: "Seizures, fainting, panic attacks, and mental health crises — know how to respond calmly.", link: "firstaid-1.html?tab=neuro", btnText: "View Steps →" },
+
+    /* e-shock firstaid */
+    "Electric Shock First-Aid": { description: "Electric shock can stop the heart. Learn how to safely help a victim and when to start CPR.", link: "firstaid-1.html?tab=other", btnText: "View Steps →" },
+    
+    /* Smoke Inhalation */
+    "Smoke Inhalation": { description: "Smoke inhalation can be fatal. Get to fresh air fast and learn warning signs of delayed symptoms.", link: "firstaid-1.html?tab=other", btnText: "View Steps →" },
+
+
+    /* Safety Tips */
+    "Safety Tips": { message: "What safety topic interests you?", options: ["Road", "Digital Safety", "Home", "Personal", "Travel", "Financial", "Workplace"] },
+    "Road": { description: "Road safety tips to prevent accidents, handle emergencies, and stay safe while driving or walking.", link: "safety.html?tab=road" },
+    "Digital Safety":  { description: "Protect yourself online. Learn about cybersecurity, safe browsing, and digital privacy.", link: "safety.html?tab=digital" },
+    "Home":     { description: "Keep your home safe from fires, falls, and other household hazards.", link: "safety.html?tab=home" },
+    "Personal":     { description: "Personal safety tips for daily life — self-defense awareness, staying alert, and staying secure.", link: "safety.html?tab=personal" },
+    "Travel":     { description: "Travel safely with tips on packing essentials, safe transport, and handling emergencies abroad.", link: "safety.html?tab=travel" },
+    "Financial":     { description: "Protect yourself from scams, frauds, and financial loss with smart safety practices.", link: "safety.html?tab=financial" },
+    "Workplace":     { description: "Workplace safety: prevent injuries, know your rights, and handle emergencies at work.", link: "safety.html?tab=workplace" },
+
+    /* Emergency Help */
+    "Emergency Help": { message: "Which emergency service do you need?", options: ["Natural", "Fire", "Vehicle", "Man-Made", "Climate", "Misc"] },
+    "Natural":     { description: "Handle natural disasters — earthquakes, floods, cyclones, and landslides step by step.", link: "emergency-1.html?tab=natural" },
+    "Fire":  { description: "Fire emergency response — escape safely, use extinguishers, and call for help.", link: "emergency-1.html?tab=fire" },
+    "Vehicle": { description: "Road accident response — securing the scene, helping the injured, and alerting authorities.", link: "emergency-1.html?tab=vehicle" },
+    "Man-Made": { description: "Respond to man-made disasters — gas leaks, explosions, chemical spills, and terrorism.", link: "emergency-1.html?tab=man" },
+    "Climate": { description: "Climate emergencies — extreme heat, cold waves, and weather-related hazards.", link: "emergency-1.html?tab=climate" },
+    "Misc": { description: "Other emergencies — missing persons, power outages, crowd crush, and more.", link: "emergency-1.html?tab=misc" },
+
+    /* rights */
+    "Basic-Rights": { message: "What would you like support with?", options: ["Fundamental", "Police & Law", "Consumer", "Social", "Labor", "Digital Rights", "Special Group"] },
+    "Fundamental":     { description: "Know your fundamental rights as a citizen — equality, freedom, and constitutional protections.", link: "rights.html?tab=fundamental" },
+    "Police & Law":    { description: "Know your rights when dealing with police, arrests, FIRs, and legal proceedings.", link: "rights.html?tab=police" },
+    "Consumer": { description: "Consumer rights — how to file complaints, get refunds, and fight fraudulent sellers.", link: "rights.html?tab=consumer" },
+    "Social": { description: "Social rights — right to education, healthcare, and protection from discrimination.", link: "rights.html?tab=social" },
+    "Labor": { description: "Labor rights — minimum wage, working hours, leave policies, and workplace protections.", link: "rights.html?tab=labor" },
+    "Digital": { description: "Reignite your motivation with proven strategies and mindset shifts.", link: "rights.html?tab=digital" },
+    "Special Group": { description: "Rights for women, children, senior citizens, and people with disabilities.", link: "rights.html?tab=special"},
+  };
+
+  /* ════════════ STATE ════════════ */
+  let cbHistory     = [];
+  let cbCurrentNode = "root";
+
+  /* ════════════ DOM ════════════ */
+  const cbToggle   = document.getElementById("chat-toggle");
+  const cbWindow   = document.getElementById("chat-window");
+  const cbMessages = document.getElementById("cb-messages");
+  const cbOptsGrid = document.getElementById("cb-opts-grid");
+  const cbOptsSec  = document.getElementById("cb-options");
+  const cbBackBtn  = document.getElementById("cb-back-btn");
+  const cbNotifDot = document.getElementById("cb-notif-dot");
+
+  /* ════════════ TOGGLE ════════════ */
+  cbToggle.addEventListener("click", () => {
+    const isOpen = cbWindow.classList.toggle("open");
+    cbToggle.classList.toggle("open", isOpen);
+    if (isOpen) {
+      cbNotifDot.style.display = "none";
+      if (cbMessages.childElementCount === 0) cbStart();
+    }
+  });
+
+  /* ════════════ START ════════════ */
+  function cbStart() {
+    cbCurrentNode = "root";
+    cbHistory = [];
+    cbRenderNode("root");
+  }
+
+  /* ════════════ RENDER NODE ════════════ */
+  function cbRenderNode(key) {
+    const node = CB_TREE[key];
+    if (!node) return;
+    if (node.message) {
+      cbShowTyping().then(() => {
+        cbAddBot(node.message);
+        cbBuildOpts(node.options);
+        cbUpdateBack();
+        cbScroll();
+      });
+    }
+    if (node.description) {
+      cbShowTyping().then(() => {
+        cbAddCard(node.description, node.link, node.btnText);
+        cbOptsSec.style.display = "none";
+        cbUpdateBack();
+        cbScroll();
+      });
+    }
+  }
+
+  /* ════════════ OPTION CLICK ════════════ */
+  function cbHandleOpt(label) {
+    cbHistory.push(cbCurrentNode);
+    cbCurrentNode = label;
+    cbAddUser(label);
+    cbOptsGrid.innerHTML = "";
+    cbRenderNode(label);
+  }
+
+  /* ════════════ BACK ════════════ */
+  cbBackBtn.addEventListener("click", () => {
+    if (cbHistory.length === 0) return;
+    cbCurrentNode = cbHistory.pop();
+    cbMessages.innerHTML = "";
+    cbOptsSec.style.display = "";
+    cbReplay();
+    cbUpdateBack();
+  });
+
+  function cbReplay() {
+    const path = [...cbHistory, cbCurrentNode];
+    cbMessages.innerHTML = "";
+    cbOptsGrid.innerHTML = "";
+    path.forEach((key, i) => {
+      const node = CB_TREE[key];
+      if (!node) return;
+      if (i < path.length - 1 && node.message) {
+        cbMessages.appendChild(cbMakeBot(node.message));
+        cbMessages.appendChild(cbMakeUser(path[i + 1]));
+      }
+    });
+    cbRenderNode(cbCurrentNode);
+  }
+
+  function cbUpdateBack() { cbBackBtn.disabled = cbHistory.length === 0; }
+
+  /* ════════════ BUILD OPTIONS ════════════ */
+  function cbBuildOpts(opts = []) {
+    cbOptsGrid.innerHTML = "";
+    cbOptsSec.style.display = "";
+    opts.forEach(label => {
+      const btn = document.createElement("button");
+      btn.className = "cb-opt-btn";
+      btn.textContent = label;
+      btn.addEventListener("click", () => cbHandleOpt(label));
+      cbOptsGrid.appendChild(btn);
+    });
+  }
+
+  /* ════════════ BUBBLE HELPERS ════════════ */
+  function cbMakeBot(text) {
+    const row = document.createElement("div");
+    row.className = "cb-bubble-row bot";
+    row.innerHTML = `<div class="cb-bot-avatar">🛡️</div><div class="cb-bubble bot">${text}</div>`;
+    return row;
+  }
+  function cbAddBot(text) { cbMessages.appendChild(cbMakeBot(text)); cbScroll(); }
+
+  function cbMakeUser(text) {
+    const row = document.createElement("div");
+    row.className = "cb-bubble-row user";
+    row.innerHTML = `<div class="cb-bubble user">${text}</div>`;
+    return row;
+  }
+  function cbAddUser(text) { cbMessages.appendChild(cbMakeUser(text)); cbScroll(); }
+
+  function cbAddCard(desc, link, btnText) {
+    const card = document.createElement("div");
+    card.className = "cb-info-card";
+    card.innerHTML = `
+      <p>${desc}</p>
+      <a href="${link}" class="cb-read-more">
+        ${btnText || "Read More"}
+        <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+      </a>`;
+    cbMessages.appendChild(card);
+    cbScroll();
+  }
+
+  /* ════════════ TYPING ════════════ */
+  function cbShowTyping(delay = 680) {
+    return new Promise(resolve => {
+      const row = document.createElement("div");
+      row.className = "cb-bubble-row bot cb-typing-row";
+      row.innerHTML = `<div class="cb-bot-avatar">🛡️</div><div class="cb-typing-bubble"><span></span><span></span><span></span></div>`;
+      cbMessages.appendChild(row);
+      cbScroll();
+      setTimeout(() => { row.remove(); resolve(); }, delay);
+    });
+  }
+
+  /* ════════════ SCROLL ════════════ */
+  function cbScroll() { requestAnimationFrame(() => { cbMessages.scrollTop = cbMessages.scrollHeight; }); }
+  </script>
+
+
+<!-- ══════════════════════════════════════
+     PANIC MODAL
+══════════════════════════════════════ -->
+<div id="panic-overlay" onclick="closePanic()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;backdrop-filter:blur(6px);animation:fadeIn 0.2s ease;"></div>
+
+<div id="panic-modal" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:10000;background:#111418;border-radius:28px 28px 0 0;padding:24px 20px 40px;border-top:1px solid rgba(255,59,59,0.3);animation:slideUp 0.3s ease;">
+  
+  <!-- Handle -->
+  <div style="width:40px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:0 auto 20px;"></div>
+
+  <!-- Title -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+    <div style="font-size:28px;">🆘</div>
+    <div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:#ff3b3b;">EMERGENCY HELP</div>
+      <div style="font-size:12px;color:#6b7280;">Tap any number to call immediately</div>
+    </div>
+  </div>
+
+  <!-- Warning banner -->
+  <div style="background:rgba(255,59,59,0.08);border:1px solid rgba(255,59,59,0.25);border-radius:14px;padding:12px 14px;margin:16px 0;display:flex;gap:10px;align-items:center;">
+    <div style="font-size:18px;">⚠️</div>
+    <div style="font-size:12px;color:#ff8080;line-height:1.5;">If life is in danger, call <strong>112</strong> immediately . This app is not a substitute for professional help.</div>
+  </div>
+
+  <!-- Call buttons -->
+  <div style="display:flex;flex-direction:column;gap:10px;">
+
+    <a href="tel:112" style="display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#ff3b3b,#cc2020);border-radius:16px;padding:16px 18px;text-decoration:none;box-shadow:0 6px 20px rgba(255,59,59,0.35);">
+      <div style="font-size:26px;">🚨</div>
+      <div style="flex:1;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;letter-spacing:1px;">112 — All emergency services</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.7);">Police · Ambulance · Fire - All in All</div>
+      </div>
+      <div style="font-size:22px;">📞</div>
+    </a>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+
+      <a href="tel:102" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:#161b22;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:14px 10px;text-decoration:none;">
+        <div style="font-size:22px;">🚑</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#ff7c3b;letter-spacing:1px;">102</div>
+        <div style="font-size:11px;color:#6b7280;">Ambulance</div>
+      </a>
+
+      <a href="tel:101" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:#161b22;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:14px 10px;text-decoration:none;">
+        <div style="font-size:22px;">🔥</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#ff7c3b;letter-spacing:1px;">101</div>
+        <div style="font-size:11px;color:#6b7280;">Fire Brigade</div>
+      </a>
+
+      <a href="tel:100" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:#161b22;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:14px 10px;text-decoration:none;">
+        <div style="font-size:22px;">👮</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#ff7c3b;letter-spacing:1px;">100</div>
+        <div style="font-size:11px;color:#6b7280;">Police</div>
+      </a>
+
+      <a href="tel:108" style="display:flex;flex-direction:column;align-items:center;gap:6px;background:#161b22;border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:14px 10px;text-decoration:none;">
+        <div style="font-size:22px;">🏥</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#ff7c3b;letter-spacing:1px;">108</div>
+        <div style="font-size:11px;color:#6b7280;">EMRI</div>
+      </a>
+
+    </div>
+
+    <!-- Close button -->
+    <button onclick="closePanic()" style="width:100%;padding:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:14px;color:#6b7280;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;margin-top:4px;">
+      ✕ Close
+    </button>
+
+  </div>
+</div>
+
+<style>
+  @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+  @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
+</style>
+
+<script>
+  function openPanic() {
+    document.getElementById('panic-overlay').style.display = 'block';
+    document.getElementById('panic-modal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
+  function closePanic() {
+    document.getElementById('panic-overlay').style.display = 'none';
+    document.getElementById('panic-modal').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+</script>
+
+</body>
+</html>

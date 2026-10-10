@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>LifeKit — Basic Safety</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#0a0c10; --surface:#111418; --card:#161b22; --border:rgba(255,255,255,0.07); --accent:#f5c518; --accent2:#e8a800; --text:#f0f4f8; --muted:#6b7280; }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; padding-bottom:48px; }
+    .top-bar { display:flex; align-items:center; gap:14px; padding:52px 20px 16px; position:sticky; top:0; background:rgba(10,12,16,0.94); backdrop-filter:blur(14px); z-index:100; border-bottom:1px solid var(--border); }
+    .back-btn { width:38px; height:38px; background:var(--card); border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; text-decoration:none; color:var(--text); flex-shrink:0; }
+    .back-btn:active { background:var(--surface); }
+    .top-title { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:2px; color:var(--accent); }
+    .hero { padding:24px 20px 16px; animation:fadeUp 0.5s ease forwards; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+    .hero-label { font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
+    .hero h1 { font-size:26px; font-weight:600; line-height:1.2; margin-bottom:6px; }
+    .hero p { font-size:13px; color:var(--muted); line-height:1.6; }
+    .search-wrap { padding:0 20px 14px; }
+    .search-box { background:var(--card); border:1px solid var(--border); border-radius:14px; display:flex; align-items:center; gap:10px; padding:12px 16px; }
+    .search-box span { font-size:15px; opacity:0.4; }
+    .search-box input { background:none; border:none; outline:none; color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; flex:1; }
+    .search-box input::placeholder { color:var(--muted); }
+    .tabs-wrap { overflow-x:auto; padding:0 20px 4px; scrollbar-width:none; }
+    .tabs-wrap::-webkit-scrollbar { display:none; }
+    .tabs { display:flex; gap:8px; width:max-content; }
+    .tab { padding:8px 14px; border-radius:20px; border:1px solid var(--border); background:var(--card); font-size:12px; font-weight:500; color:var(--muted); cursor:pointer; white-space:nowrap; transition:all 0.2s; -webkit-user-select:none; }
+    .tab.active { background:var(--accent); border-color:var(--accent); color:#000; }
+    .content-area { padding:16px 20px; }
+    .topic-section { display:none; }
+    .topic-section.active { display:block; animation:fadeUp 0.3s ease; }
+    .accordion { display:flex; flex-direction:column; gap:10px; }
+    .acc-item { background:var(--card); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+    .acc-header { display:flex; align-items:center; gap:12px; padding:16px; cursor:pointer; -webkit-user-select:none; }
+    .acc-header:active { background:rgba(255,255,255,0.03); }
+    .acc-icon { font-size:22px; flex-shrink:0; }
+    .acc-title { font-size:15px; font-weight:600; flex:1; }
+    .acc-arrow { font-size:12px; color:var(--muted); transition:transform 0.25s; flex-shrink:0; }
+    .acc-item.open .acc-arrow { transform:rotate(180deg); }
+    .acc-body { display:none; padding:0 16px 16px; }
+    .acc-item.open .acc-body { display:block; animation:fadeUp 0.25s ease; }
+    .steps { display:flex; flex-direction:column; gap:10px; margin-top:4px; }
+    .step { display:flex; gap:12px; align-items:flex-start; background:rgba(245,197,24,0.04); border:1px solid rgba(245,197,24,0.1); border-radius:12px; padding:12px; }
+    .step-n { width:26px; height:26px; border-radius:50%; background:rgba(245,197,24,0.12); border:1px solid rgba(245,197,24,0.25); color:var(--accent); font-family:'Bebas Neue',sans-serif; font-size:15px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .step-c h4 { font-size:14px; font-weight:600; margin-bottom:3px; }
+    .step-c p { font-size:12px; color:var(--muted); line-height:1.5; }
+    .warn { background:rgba(255,59,59,0.07); border:1px solid rgba(255,59,59,0.2); border-radius:12px; padding:12px 14px; margin-top:12px; display:flex; gap:10px; align-items:flex-start; }
+    .warn p { font-size:12px; color:#ff8080; line-height:1.5; }
+    .tip { background:rgba(59,138,255,0.07); border:1px solid rgba(59,138,255,0.2); border-radius:12px; padding:12px 14px; margin-top:10px; display:flex; gap:10px; align-items:flex-start; }
+    .tip p { font-size:12px; color:#80b8ff; line-height:1.5; }
+    .wi { font-size:16px; flex-shrink:0; }
+    .no-result { text-align:center; padding:40px 20px; color:var(--muted); font-size:14px; display:none; }
+  </style>
+</head>
+<body>
+<div class="top-bar">
+  <a class="back-btn" href="frontpage.html">←</a>
+  <div class="top-title">🛡️ Basic Safety</div>
+</div>
+<div class="hero">
+  <div class="hero-label">Prevention Guide</div>
+  <h1>Basic Safety<br>Essentials</h1>
+  <p>Smart habits that protect you every day — on roads, online, at home, and beyond.</p>
+</div>
+<div class="search-wrap">
+  <div class="search-box">
+    <span>🔍</span>
+    <input type="text" id="searchInput" placeholder="Search... e.g. phishing, road, women safety" oninput="doSearch()" />
+  </div>
+</div>
+<div class="tabs-wrap">
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('road',this)">🚗 Road</div>
+    <div class="tab" onclick="showTab('digital',this)">🔒 Digital</div>
+    <div class="tab" onclick="showTab('home',this)">🏠 Home</div>
+    <div class="tab" onclick="showTab('personal',this)">👤 Personal</div>
+    <div class="tab" onclick="showTab('travel',this)">✈️ Travel</div>
+    <div class="tab" onclick="showTab('financial',this)">💳 Financial</div>
+    <div class="tab" onclick="showTab('workplace',this)">🏢 Workplace</div>
+  </div>
+</div>
+<div class="content-area">
+<div class="no-result" id="noResult">No topics found. Try a different keyword.</div>
+
+<!-- ROAD -->
+<div class="topic-section active" id="tab-road">
+<div class="accordion">
+  <div class="acc-item" data-keywords="road traffic safety helmet seatbelt driving">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🏍️</div><div class="acc-title">Road & Traffic Safety</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Helmet & Seatbelt — Always</h4><p>No exception. Helmet reduces fatal head injury by 70%. Seatbelt keeps you in vehicle during collision — ejection is almost always fatal.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>No Phone While Moving</h4><p>Phone use while driving increases accident risk 4x — same as drunk driving. If you must call, pull over and stop completely.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Cross at Zebra Crossings</h4><p>Look right, left, right again. Make eye contact with driver before stepping. Don't assume they've seen you.</p></div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Never Drink & Drive</h4><p>Even 1 drink affects reaction time and judgment. Take auto/cab — no debate, no exception.</p></div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-c"><h4>Be Visible at Night</h4><p>Light-colored clothes, reflectors, or torch if walking on dark roads. Assume drivers cannot see you until proven otherwise.</p></div></div>
+    </div>
+    <div class="tip"><div class="wi">💡</div><p>Share live location when traveling at night. 5 seconds of effort that can save your life.</p></div>
+    </div>
+  </div>
+  <div class="acc-item" data-keywords="mobile during driving distracted phone">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">📵</div><div class="acc-title">Mobile During Driving — Why It Kills</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Reaction Time Doubles</h4><p>At 60 km/h, a 2-second phone distraction means you travel 33 meters blind. That's enough to miss a child crossing.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Handsfree is Not Safe Either</h4><p>Handsfree calls still distract your brain — it's the conversation, not just the hand holding the phone. Your attention is split.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Use DND While Driving</h4><p>Enable "Do Not Disturb while Driving" in iPhone (Focus) or Android settings. Auto-replies keep your contacts informed.</p></div></div>
+    </div></div>
+  </div>
+  <div class="acc-item" data-keywords="school bus child safety stranger danger">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🚌</div><div class="acc-title">School Bus & Child Safety</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Teach Bus Safety</h4><p>Wait 3 big steps from kerb. Never cross behind the bus. Wait for driver signal before crossing in front.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Stranger Danger Basics</h4><p>Teach children: no adult needs help from a child. If uncomfortable, yell loudly "THIS IS NOT MY PARENT" and run to nearest crowd.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Safe Words & Check-In</h4><p>Establish a family safe word. Child should know: home address, parent phone number, and safe adults to approach.</p></div></div>
+    </div></div>
+  </div>
+</div>
+</div>
+
+<!-- DIGITAL -->
+<div class="topic-section" id="tab-digital">
+<div class="accordion">
+  <div class="acc-item" data-keywords="cyber security online phishing otp fraud password">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🔐</div><div class="acc-title">Cybersecurity & Online Safety</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Strong Unique Passwords</h4><p>Different password for every account. Use passphrase: "BlueCat$RunsFast2024" — easy to remember, hard to crack.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Never Share OTP</h4><p>No real bank, government, or company will ever ask for your OTP. Ever. Hang up immediately. Don't feel embarrassed.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Enable 2FA Everywhere</h4><p>Turn on Two-Factor Authentication for WhatsApp, email, banking. Even if password stolen, they can't log in.</p></div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Phishing Links</h4><p>Look at actual URL before clicking — "hdfc-bank-alert.com" is not HDFC. When in doubt, open the real site manually.</p></div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-c"><h4>Public Wi-Fi</h4><p>Never do banking or log into accounts on public Wi-Fi. Use mobile data for anything sensitive.</p></div></div>
+    </div>
+    <div class="warn"><div class="wi">⚠️</div><p>Cyber fraud? Call 1930 (National Cyber Crime Helpline) or report at cybercrime.gov.in immediately — faster action = more recovery chance.</p></div>
+    </div>
+  </div>
+  <div class="acc-item" data-keywords="digital privacy social media location personal data">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">👁️</div><div class="acc-title">Digital Privacy & Social Media</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Don't Share Location Publicly</h4><p>Real-time location stories (train, hotel check-ins) tell burglars your home is empty. Share after you return.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Audit App Permissions</h4><p>Regularly check which apps have camera, microphone, location access. Revoke anything that doesn't need it.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Right to Be Forgotten</h4><p>You can request Google to remove personal info from search results (Google's "Results About You" tool). Works for old photos, addresses etc.</p></div></div>
+    </div></div>
+  </div>
+  <div class="acc-item" data-keywords="deepfake identity theft voice photo fake">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🎭</div><div class="acc-title">Deepfake & Identity Theft</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Recognize Deepfakes</h4><p>Look for: unnatural blinking, hair edges, ear details, teeth looking off, background distortion. When in doubt, verify via different channel.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Voice Cloning Scams</h4><p>"Family emergency" calls using cloned voice are growing. Establish a family code word — if they don't say it, it's a scam.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Limit Public Photos</h4><p>Fewer public photos = less training data for deepfakes. Make social media private. Review tagged photos regularly.</p></div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Identity Stolen?</h4><p>File complaint at cybercrime.gov.in + local police. Inform bank, change all passwords, enable credit monitoring.</p></div></div>
+    </div></div>
+  </div>
+  <div class="acc-item" data-keywords="smart home iot alexa google home security camera">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🏡</div><div class="acc-title">Smart Home & IoT Security</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Change Default Passwords</h4><p>Router, CCTV camera, smart doorbell — all come with default passwords that are publicly known. Change them on day one.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Keep Firmware Updated</h4><p>Smart device updates patch security holes. Enable auto-update for all IoT devices.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Indoor Cameras Carefully</h4><p>Never place cameras in bedrooms or bathrooms regardless of brand. If hacked, footage is on the internet — permanently.</p></div></div>
+    </div></div>
+  </div>
+</div>
+</div>
+
+<!-- HOME -->
+<div class="topic-section" id="tab-home">
+<div class="accordion">
+  <div class="acc-item" data-keywords="home security lock door window burglar">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🔒</div><div class="acc-title">Home Security</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Lock Up Before Sleep</h4><p>Ground floor windows are primary entry points. Always lock before sleeping. Grills add extra protection.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Verify Before Opening Door</h4><p>Don't open to strangers. Legitimate officials carry ID and won't mind you asking. Call their office to verify if unsure.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Lighting Matters</h4><p>Well-lit entry and surroundings deter thieves. Motion-sensor lights are cheap and effective.</p></div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Valuables Out of Sight</h4><p>Don't keep valuables visible from windows. Don't post travel plans on social media before leaving — signals empty home.</p></div></div>
+    </div></div>
+  </div>
+  <div class="acc-item" data-keywords="kitchen electrical safety wire geele haath switch oil fire">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">⚡</div><div class="acc-title">Kitchen & Electrical Safety</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Never Wet Hands Near Switches</h4><p>Dry hands completely before touching switches or plugs. A fraction of a second's complacency can cause electrocution.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Unplug When Not in Use</h4><p>Iron, charger, heater — unplug when done. Standby power causes fires. Don't overload extension boards.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Oil Fire — Never Use Water</h4><p>Water on oil fire causes explosive splattering. Smother with a lid or wet cloth. Turn off gas source. Never move burning oil pan.</p></div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Gas Cylinder Safety</h4><p>Check rubber pipe every 6 months for cracks. Check expiry date on metal ring of cylinder. Never use near open flame when connecting.</p></div></div>
+    </div></div>
+  </div>
+  <div class="acc-item" data-keywords="fire safety home smoke alarm prevention">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🧯</div><div class="acc-title">Home Fire Safety & Prevention</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Install Smoke Alarm</h4><p>Place in bedroom, kitchen, hallway. Test monthly. Replace batteries yearly. A smoke alarm doubles your survival chance.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Plan Escape Routes</h4><p>Know 2 ways out of every room. Practice with family. Decide meeting point outside. Do this before a fire happens.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Keep Fire Extinguisher</h4><p>ABC-type extinguisher handles most home fires. Mount near kitchen exit (not inside kitchen — fire may block access).</p></div></div>
+    </div></div>
+  </div>
+  <div class="acc-item" data-keywords="elevator lift stuck trapped maintenance">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🛗</div><div class="acc-title">Elevator / Lift Safety</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>If Lift Stops</h4><p>Stay calm. Press alarm button and call button. Call building security or emergency number on panel. Never try to force doors open.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Never Jump Inside Lift</h4><p>Jumping can trigger safety sensors and stop the lift. Never try to climb out of a stuck lift — drop zones between floors are fatal.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Never Use During Fire</h4><p>Power outage during fire = stuck in a metal box filling with smoke. Always use stairs during fire evacuation.</p></div></div>
+    </div></div>
+  </div>
+</div>
+</div>
+
+<!-- PERSONAL -->
+<div class="topic-section" id="tab-personal">
+<div class="accordion">
+  <div class="acc-item" data-keywords="women safety self defense harassment night">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">👩</div><div class="acc-title">Women's Safety</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Trust Your Instincts</h4><p>If something feels wrong — it is. Leave immediately. You don't need proof. Your gut is a survival tool.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Share Live Location</h4><p>When going out alone — especially at night — share live location with trusted person. Update when you reach safely.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Emergency Contacts on Speed Dial</h4><p>Set police (100), Women's Helpline (1091), and trusted contact as quick-dial. Know how to dial without looking at phone.</p></div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-c"><h4>If Followed</h4><p>Don't go home — go to crowded public place, police station, or hospital. Make eye contact with bystanders. Shout if needed.</p></div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-c"><h4>Auto/Cab Safety</h4><p>Share cab details (number plate, driver name) with someone. Sit behind driver — not passenger side. Trust your read of the driver.</p></div></div>
+    </div>
+    <div class="tip"><div class="wi">💡</div><p>Nirbhaya Fund resources: Women's Helpline 181, Domestic Violence 181, Sexual Harassment 1091 — all free, 24/7.</p></div>
+    </div>
+  </div>
+  <div class="acc-item" data-keywords="night travel safety dark street alone GPS tracking">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🌙</div><div class="acc-title">Night Travel Safety</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Plan Your Route</h4><p>Know the route before you leave. Stick to lit, populated roads. Avoid shortcuts through isolated areas even if faster.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Be Aware, Not Distracted</h4><p>Earphones block situational awareness. Keep volume low or one ear free. Be aware of who's around you.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Walk Confidently</h4><p>Head up, purposeful stride. Looking lost or unsure marks you as a target. Project that you know exactly where you're going.</p></div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Check In When Safe</h4><p>Send a "home safe" message. Apps like bSafe and Noonlight have automatic check-in and SOS features.</p></div></div>
+    </div></div>
+  </div>
+  <div class="acc-item" data-keywords="stalker picha karna following harassment">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">👤</div><div class="acc-title">Stalker Safety</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Go to Crowded Place</h4><p>If followed — go to a busy shop, police station, hospital, or any crowded area. Don't go home or to an isolated place.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Vary Your Routine</h4><p>Change routes, timings. Don't be predictable. Stalkers rely on patterns to find you.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Document Everything</h4><p>Screenshot messages, save dates/times of incidents. This is evidence for police FIR under IPC Section 354D (Stalking).</p></div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Report to Police</h4><p>Stalking is a cognizable offence — police must register FIR. If they refuse, approach Magistrate directly. Don't ignore it.</p></div></div>
+    </div></div>
+  </div>
+  <div class="acc-item" data-keywords="ragging bullying college school anti-ragging">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🎓</div><div class="acc-title">Ragging & Bullying — College/School</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Know It's Illegal</h4><p>Ragging is a criminal offence in India. UGC Anti-Ragging regulations mandate expulsion and imprisonment for perpetrators.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Report Immediately</h4><p>Anti-Ragging Helpline: 1800-180-5522 (free). Report to college Anti-Ragging Committee. You're protected — your name is kept confidential.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>For Bullying</h4><p>Document incidents (screenshots, dates). Report to school counselor or principal. If physical — file police complaint. Don't normalize it.</p></div></div>
+    </div></div>
+  </div>
+  <div class="acc-item" data-keywords="dating app safety online meet stranger public">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">💘</div><div class="acc-title">Dating App Safety</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>First Meeting — Public Place Always</h4><p>Coffee shop, restaurant, mall — never private location. Tell a friend where you're going and who you're meeting.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Don't Share Personal Details Early</h4><p>Don't give last name, home address, workplace, or daily routine to someone you haven't met in person and verified.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Reverse Image Search</h4><p>Google reverse image search profile photos — catfishing is common. Real people don't typically use model-quality photos.</p></div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Trust Your Read</h4><p>If something feels off — leave. You don't owe anyone your time or an explanation. Safety first, politeness second.</p></div></div>
+    </div></div>
+  </div>
+  <div class="acc-item" data-keywords="child women good touch bad touch pocso">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🛡️</div><div class="acc-title">Child Safety — Good Touch/Bad Touch</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Teach Body Autonomy</h4><p>Teach children: their body belongs to them. They can say NO to any touch — even from relatives or trusted adults — if uncomfortable.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Safe vs Unsafe Touch</h4><p>Safe: handshake, hug they initiate. Unsafe: touch on private parts, touches that make them feel scared or confused.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Tell a Safe Adult</h4><p>Children must know: if someone touches them wrongly — tell a trusted adult immediately. They will not be in trouble.</p></div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-c"><h4>POCSO Act</h4><p>Any sexual act with a child under 18 is a crime under POCSO — even if child "consented." Penalty: 7 years to life imprisonment.</p></div></div>
+    </div></div>
+  </div>
+</div>
+</div>
+
+<!-- TRAVEL -->
+<div class="topic-section" id="tab-travel">
+<div class="accordion">
+  <div class="acc-item" data-keywords="public transport train bus safety stampede ticket">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🚆</div><div class="acc-title">Public Transport Safety</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Guard Belongings</h4><p>Keep bag in front. Inner pockets for phone/wallet. Don't display expensive items. Pickpockets target distracted commuters.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Know Emergency Exits</h4><p>When boarding train or bus — note nearest exit. In emergency, knowing this saves seconds that matter.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Trust Your Instincts</h4><p>If someone makes you uncomfortable — move. Change seats, compartments, or get off at next stop. Don't wait to be sure.</p></div></div>
+    </div></div>
+  </div>
+  <div class="acc-item" data-keywords="solo travel scam anjaan sheher safety abroad">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🌍</div><div class="acc-title">Solo Travel Safety</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Research Before You Go</h4><p>Know: local scams, safe areas, unsafe areas, local emergency numbers, nearest Indian Embassy address.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Register with Embassy</h4><p>For international travel: register at indianembassy.org or MEA portal. They can reach you in emergencies.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Common Scams</h4><p>"Friendly local" offering too much help, fake taxis, gem scams, "closed today" redirections, distraction theft — research specific destination scams.</p></div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Digital Safety Abroad</h4><p>Use VPN on hotel/café Wi-Fi. Keep offline maps downloaded. Don't store hotel room number in phone case with key card.</p></div></div>
+    </div></div>
+  </div>
+  <div class="acc-item" data-keywords="camping trekking jungle hiking wild animals lost">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">⛺</div><div class="acc-title">Camping & Trekking Safety</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Tell Someone Your Plan</h4><p>Share exact route, destination, and expected return time with someone responsible. Check in at intervals.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>If Lost</h4><p>STOP: Stop, Think, Observe, Plan. Stay put — moving while lost makes rescue harder. Use whistle (3 blasts = distress). Find high ground for signal.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Wild Animal Encounter</h4><p>Don't run — triggers chase instinct. Back away slowly. Make yourself look larger. Don't make sudden movements. Specific behavior varies by animal — research beforehand.</p></div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Weather Changes</h4><p>Mountain weather can change in minutes. If dark clouds build — descend immediately. Hypothermia and lightning are real risks.</p></div></div>
+    </div></div>
+  </div>
+  <div class="acc-item" data-keywords="swimming pool beach rip current drowning water safety">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🏊</div><div class="acc-title">Swimming Pool & Beach Safety</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Rip Currents</h4><p>Don't swim against a rip current — you'll exhaust yourself. Swim parallel to shore until out of current, then swim back at angle.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Swim Near Lifeguard</h4><p>Always swim in designated areas with active lifeguard. Red flag = no swimming. Respect flags — they save lives.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Pool Rules</h4><p>No running. No diving in shallow end (causes spinal injuries). Supervision for children at all times — drowning is silent, not splashy.</p></div></div>
+    </div></div>
+  </div>
+</div>
+</div>
+
+<!-- FINANCIAL -->
+<div class="topic-section" id="tab-financial">
+<div class="accordion">
+  <div class="acc-item" data-keywords="atm banking safety card pin skimmer">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🏧</div><div class="acc-title">ATM & Banking Safety</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Cover Your PIN Always</h4><p>Shield keypad with your hand even when alone. Cameras can be placed anywhere. This is a permanent habit, not situational.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Check for Skimmer</h4><p>Wiggle the card slot — a skimmer overlay will be loose. Check for extra camera above keypad. If suspicious — don't use, report to bank.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Use Bank ATMs</h4><p>Standalone ATMs in isolated areas are higher risk. Bank branch ATMs are monitored and maintained more carefully.</p></div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Enable SMS Alerts</h4><p>Turn on transaction SMS for every rupee. Immediate notification = immediate action if fraudulent transaction occurs.</p></div></div>
+    </div></div>
+  </div>
+  <div class="acc-item" data-keywords="crypto investment scam ponzi fake trading app">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">💰</div><div class="acc-title">Crypto & Investment Scams</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Red Flags</h4><p>Guaranteed returns, WhatsApp investment groups, "insider tips," celebrity endorsements, pressure to invest quickly — all are scam signals.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Verify SEBI Registration</h4><p>Any legitimate investment advisor in India must be SEBI registered. Check at sebi.gov.in before giving a single rupee.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Fake Apps</h4><p>Scam apps let you "see" growing profits but block withdrawal. Only use officially listed apps from SEBI-registered platforms.</p></div></div>
+    </div>
+    <div class="warn"><div class="wi">⚠️</div><p>If scammed: report to cybercrime.gov.in + call 1930 immediately. Time matters — faster reports increase money recovery chances.</p></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- WORKPLACE -->
+<div class="topic-section" id="tab-workplace">
+<div class="accordion">
+  <div class="acc-item" data-keywords="workplace safety ergonomics posture injury machinery">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">💺</div><div class="acc-title">Workplace Ergonomics & Safety</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Correct Posture</h4><p>Screen at eye level. Back straight, feet flat on floor. Elbows at 90°. Poor posture causes chronic spinal and neck injury over time.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>20-20-20 Rule for Eyes</h4><p>Every 20 minutes: look at something 20 feet away for 20 seconds. Prevents digital eye strain and headaches.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Machinery Precautions</h4><p>Never bypass safety guards. Lockout/Tagout before maintenance. Report faulty equipment immediately — don't use and warn others.</p></div></div>
+    </div></div>
+  </div>
+  <div class="acc-item" data-keywords="food safety expired contaminated storage hygiene">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🍽️</div><div class="acc-title">Food Safety</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Danger Zone Temperature</h4><p>Bacteria multiply rapidly between 5°C–60°C. Don't leave cooked food at room temperature more than 2 hours — especially in summer.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Check Expiry Dates</h4><p>"Best before" = quality. "Use by" = safety. Never consume past "use by" date regardless of how it looks or smells.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Street Food Safety</h4><p>Choose stalls with high turnover (food cooked fresh, not sitting). Avoid raw cut fruits in unhygienic conditions. Watch if vendor washes hands.</p></div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Food Poisoning Response</h4><p>Hydrate with ORS constantly. Seek hospital if: blood in stool, fever above 39°C, symptoms in elderly/children/pregnant, no improvement in 48 hrs.</p></div></div>
+    </div></div>
+  </div>
+  <div class="acc-item" data-keywords="mental health crisis depression anxiety workplace colleague">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🧠</div><div class="acc-title">Mental Health Crisis — Recognizing & Helping</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Warning Signs</h4><p>Sudden withdrawal, giving away possessions, drastic mood changes, talking about being a burden, hopelessness, reckless behavior.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Ask Directly</h4><p>"Are you okay? Are you thinking of harming yourself?" — this doesn't plant the idea. It opens a door. Asking shows you care.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Listen Without Fixing</h4><p>Don't offer solutions. Don't minimize. Just listen. "That sounds really hard. I'm here." is more powerful than any advice.</p></div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Professional Help</h4><p>iCall: 9152987821 | NIMHANS: 080-46110007 | Vandrevala Foundation: 1860-2662-345 (24/7). Help them make the call if needed.</p></div></div>
+    </div></div>
+  </div>
+  <div class="acc-item" data-keywords="drug alcohol situation substance help overdose">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🚫</div><div class="acc-title">Drug / Alcohol Emergency Situation</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Alcohol Overdose</h4><p>Unconscious, breathing irregularly, cannot be woken = alcohol poisoning. Don't leave alone. Recovery position. Call 112. Cold shower myth is dangerous — don't do it.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Unknown Substance Intake</h4><p>If someone ingests unknown substance: note what/when/how much. Call 112 or Poison Control. Keep them awake and talking if conscious.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Help, Not Judgment</h4><p>If someone is struggling with addiction — guide toward NIMHANS helpline or local de-addiction center. Shame doesn't help recovery. Compassion does.</p></div></div>
+    </div></div>
+  </div>
+</div>
+</div>
+
+</div>
+<script>
+function showTab(id, el) {
+  document.querySelectorAll('.acc-item').forEach(i => { i.style.display = ''; i.classList.remove('open'); });
+  document.querySelectorAll('.topic-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('searchInput').value = '';
+  document.getElementById('noResult').style.display = 'none';
+}
+function toggleAcc(header) { header.parentElement.classList.toggle('open'); }
+function doSearch() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  if (!q) {
+    document.querySelectorAll('.acc-item').forEach(i => { i.style.display = ''; i.classList.remove('open'); });
+    document.querySelectorAll('.topic-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('tab-road').classList.add('active');
+    document.querySelectorAll('.tab').forEach((t,i) => { t.classList.remove('active'); if(i===0) t.classList.add('active'); });
+    document.getElementById('noResult').style.display = 'none';
+    return;
+  }
+  document.querySelectorAll('.topic-section').forEach(s => s.classList.add('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  let found = 0;
+  document.querySelectorAll('.acc-item').forEach(item => {
+    const kw = (item.dataset.keywords||'').toLowerCase();
+    const title = item.querySelector('.acc-title').textContent.toLowerCase();
+    const body = item.querySelector('.acc-body').textContent.toLowerCase();
+    if (kw.includes(q)||title.includes(q)||body.includes(q)) { item.style.display=''; item.classList.add('open'); found++; }
+    else { item.style.display='none'; }
+  });
+  document.getElementById('noResult').style.display = found===0 ? 'block' : 'none';
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const tab = params.get("tab");
+  if (tab) {
+    const targetSection = document.getElementById("tab-" + tab);
+    if (targetSection) {
+      document.querySelectorAll(".topic-section").forEach(s => s.classList.remove("active"));
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      targetSection.classList.add("active");
+      document.querySelectorAll(".tab").forEach(btn => {
+        const oc = btn.getAttribute("onclick") || "";
+        if (oc.includes("'" + tab + "'")) btn.classList.add("active");
+      });
+    }
+  }
+});
+</script>
+</body>
+</html>

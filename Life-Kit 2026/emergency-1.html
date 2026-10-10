@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>LifeKit — Emergency</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0a0c10; --surface:#111418; --card:#161b22; --border:rgba(255,255,255,0.07);
+      --accent:#ff7c3b; --accent2:#ffb23b; --text:#f0f4f8; --muted:#6b7280;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; padding-bottom:48px; }
+    .top-bar { display:flex; align-items:center; gap:14px; padding:52px 20px 16px; position:sticky; top:0; background:rgba(10,12,16,0.94); backdrop-filter:blur(14px); z-index:100; border-bottom:1px solid var(--border); }
+    .back-btn { width:38px; height:38px; background:var(--card); border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; text-decoration:none; color:var(--text); flex-shrink:0; }
+    .back-btn:active { background:var(--surface); }
+    .top-title { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:2px; color:var(--accent); }
+    .hero { padding:24px 20px 16px; animation:fadeUp 0.5s ease forwards; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+    .hero-label { font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
+    .hero h1 { font-size:26px; font-weight:600; line-height:1.2; margin-bottom:6px; }
+    .hero p { font-size:13px; color:var(--muted); line-height:1.6; }
+    /* Emergency numbers */
+    .sos-strip { margin:0 20px 16px; background:rgba(255,124,59,0.08); border:1px solid rgba(255,124,59,0.25); border-radius:16px; padding:14px 16px; }
+    .sos-strip h3 { font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:10px; }
+    .sos-nums { display:flex; gap:8px; flex-wrap:wrap; }
+    .sos-chip { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:8px 12px; text-decoration:none; display:flex; flex-direction:column; gap:2px; }
+    .sos-chip span:first-child { font-size:10px; color:var(--muted); }
+    .sos-chip span:last-child { font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--accent); letter-spacing:1px; }
+    /* search */
+    .search-wrap { padding:0 20px 14px; }
+    .search-box { background:var(--card); border:1px solid var(--border); border-radius:14px; display:flex; align-items:center; gap:10px; padding:12px 16px; }
+    .search-box span { font-size:15px; opacity:0.4; }
+    .search-box input { background:none; border:none; outline:none; color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; flex:1; }
+    .search-box input::placeholder { color:var(--muted); }
+    /* tabs */
+    .tabs-wrap { overflow-x:auto; padding:0 20px 4px; scrollbar-width:none; }
+    .tabs-wrap::-webkit-scrollbar { display:none; }
+    .tabs { display:flex; gap:8px; width:max-content; }
+    .tab { padding:8px 14px; border-radius:20px; border:1px solid var(--border); background:var(--card); font-size:12px; font-weight:500; color:var(--muted); cursor:pointer; white-space:nowrap; transition:all 0.2s; -webkit-user-select:none; }
+    .tab.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+    .content-area { padding:16px 20px; }
+    .topic-section { display:none; }
+    .topic-section.active { display:block; animation:fadeUp 0.3s ease; }
+    /* accordion */
+    .accordion { display:flex; flex-direction:column; gap:10px; }
+    .acc-item { background:var(--card); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+    .acc-header { display:flex; align-items:center; gap:12px; padding:16px; cursor:pointer; -webkit-user-select:none; }
+    .acc-header:active { background:rgba(255,255,255,0.03); }
+    .acc-icon { font-size:22px; flex-shrink:0; }
+    .acc-title { font-size:15px; font-weight:600; flex:1; }
+    .acc-arrow { font-size:12px; color:var(--muted); transition:transform 0.25s; flex-shrink:0; }
+    .acc-item.open .acc-arrow { transform:rotate(180deg); }
+    .acc-body { display:none; padding:0 16px 16px; }
+    .acc-item.open .acc-body { display:block; animation:fadeUp 0.25s ease; }
+    .steps { display:flex; flex-direction:column; gap:10px; margin-top:4px; }
+    .step { display:flex; gap:12px; align-items:flex-start; background:rgba(255,124,59,0.04); border:1px solid rgba(255,124,59,0.1); border-radius:12px; padding:12px; }
+    .step-n { width:26px; height:26px; border-radius:50%; background:rgba(255,124,59,0.12); border:1px solid rgba(255,124,59,0.25); color:var(--accent); font-family:'Bebas Neue',sans-serif; font-size:15px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .step-c h4 { font-size:14px; font-weight:600; margin-bottom:3px; }
+    .step-c p { font-size:12px; color:var(--muted); line-height:1.5; }
+    .warn { background:rgba(255,59,59,0.07); border:1px solid rgba(255,59,59,0.2); border-radius:12px; padding:12px 14px; margin-top:12px; display:flex; gap:10px; align-items:flex-start; }
+    .warn p { font-size:12px; color:#ff8080; line-height:1.5; }
+    .tip { background:rgba(59,138,255,0.07); border:1px solid rgba(59,138,255,0.2); border-radius:12px; padding:12px 14px; margin-top:10px; display:flex; gap:10px; align-items:flex-start; }
+    .tip p { font-size:12px; color:#80b8ff; line-height:1.5; }
+    .wi { font-size:16px; flex-shrink:0; }
+    .no-result { text-align:center; padding:40px 20px; color:var(--muted); font-size:14px; display:none; }
+  </style>
+</head>
+<body>
+<div class="top-bar">
+  <a class="back-btn" href="frontpage.html">←</a>
+  <div class="top-title">🚨 Emergency</div>
+</div>
+<div class="hero">
+  <div class="hero-label">Crisis Response Guide</div>
+  <h1>Emergency<br>Situations</h1>
+  <p>When disaster strikes — stay calm, follow steps, and act fast.</p>
+</div>
+<div class="sos-strip">
+  <h3>📞 Quick Dial — India</h3>
+  <div class="sos-nums">
+    <a class="sos-chip" href="tel:112"><span>All Emergency</span><span>112</span></a>
+    <a class="sos-chip" href="tel:101"><span>Fire</span><span>101</span></a>
+    <a class="sos-chip" href="tel:102"><span>Ambulance</span><span>102</span></a>
+    <a class="sos-chip" href="tel:108"><span>EMRI</span><span>108</span></a>
+    <a class="sos-chip" href="tel:100"><span>Police</span><span>100</span></a>
+    <a class="sos-chip" href="tel:1930"><span>Cyber Crime</span><span>1930</span></a>
+  </div>
+</div>
+<div class="search-wrap">
+  <div class="search-box">
+    <span>🔍</span>
+    <input type="text" id="searchInput" placeholder="Search... e.g. earthquake, flood, gas leak" oninput="doSearch()" />
+  </div>
+</div>
+<div class="tabs-wrap">
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('natural',this)">🌍 Natural</div>
+    <div class="tab" onclick="showTab('fire',this)">🔥 Fire</div>
+    <div class="tab" onclick="showTab('vehicle',this)">🚗 Vehicle</div>
+    <div class="tab" onclick="showTab('man',this)">⚠️ Man-Made</div>
+    <div class="tab" onclick="showTab('climate',this)">🌡️ Climate</div>
+    <div class="tab" onclick="showTab('misc',this)">📋 Misc</div>
+  </div>
+</div>
+<div class="content-area">
+<div class="no-result" id="noResult">No topics found. Try a different keyword.</div>
+
+<!-- NATURAL -->
+<div class="topic-section active" id="tab-natural">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="earthquake bhookamp drop cover hold on">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🏚️</div><div class="acc-title">Earthquake</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>DROP to the Ground</h4><p>Don't run. Drop to hands and knees immediately — prevents being knocked down. Get under sturdy table if nearby.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>COVER Head & Neck</h4><p>Use arms to protect head and neck. Stay away from windows, walls, and heavy furniture like bookshelves.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>HOLD ON Until Shaking Stops</h4><p>Stay in position. Shaking usually lasts under 60 seconds but feels longer. Don't move until it stops completely.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Evacuate Carefully</h4><p>Check for injuries, watch for broken glass and debris. Exit using stairs only — never lifts. Move to open ground.</p></div></div>
+        <div class="step"><div class="step-n">5</div><div class="step-c"><h4>Expect Aftershocks</h4><p>Stay away from damaged buildings. Don't enter collapsed structures. Stay away from trees and power lines.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">⚠️</div><p>Doorway myth is wrong — a sturdy table offers far better protection than a doorway.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="flood paani bhadna heavy rain">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🌊</div><div class="acc-title">Flood & Heavy Rainfall</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Move to High Ground Immediately</h4><p>Don't wait for official orders. Go to upper floors or elevated areas. Floodwater rises faster than expected.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Never Walk Through Floodwater</h4><p>Even 15 cm of moving water can knock you down. Water may carry sewage, chemicals, or be electrified by downed lines.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Turn Off Electricity</h4><p>Switch off main power at fuse box before water enters if safe to do so. Electrocution is a major flood risk.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Emergency Kit Ready</h4><p>Aadhar, medicines, drinking water, torch, ORS, warm clothes. Have this bag packed before monsoon season.</p></div></div>
+        <div class="step"><div class="step-n">5</div><div class="step-c"><h4>Signal for Rescue</h4><p>If trapped — signal from roof or window with bright cloth. Call 112. Don't swim in fast-moving water.</p></div></div>
+      </div>
+      <div class="tip"><div class="wi">💡</div><p>Boil all water for at least 2 minutes after floods — taps may be contaminated for days after water recedes.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="tsunami cyclone storm warning coastal">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🌀</div><div class="acc-title">Tsunami & Cyclone</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Tsunami Warning Signs</h4><p>Sea suddenly pulls back (unusual low tide), strong earthquake felt near coast, loud roaring sound from ocean. Evacuate immediately inland — don't wait for official warning.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Tsunami: Move Inland Fast</h4><p>Go to high ground (at least 30m above sea level) or at least 3 km inland. Stay until all-clear from authorities.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Cyclone: Stay Indoors</h4><p>Get inside strong building. Stay away from windows and doors. Go to lowest floor — not top floor. Fill water containers before power goes.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Cyclone Eye — Don't Go Out</h4><p>The sudden calm in middle of cyclone is the "eye." Wind will return violently in minutes. Stay inside.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="landslide mudslide pahad khisakna">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">⛰️</div><div class="acc-title">Landslide</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Warning Signs</h4><p>Cracks in ground, tilting trees, unusual sounds (rumbling), sudden muddy water in streams. Evacuate immediately.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Move Perpendicular to Slide</h4><p>Run sideways — not uphill or downhill. A landslide travels extremely fast in its direct path.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>If Caught</h4><p>Curl into ball, protect head. Try to grab onto stable tree or rock. Avoid river channels and low areas.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="lightning aasmani bijli thunder storm">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">⚡</div><div class="acc-title">Lightning Strike</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Get Inside</h4><p>Seek shelter in solid building or hard-topped vehicle immediately. Lightning can strike from 10+ km away from storm center.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>If Caught Outside</h4><p>Lightning Squat position: crouch low, feet together, heels raised, cover ears. Don't lie flat. Move away from tall trees, water, and metal.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>If Someone is Struck</h4><p>It is safe to touch them — lightning doesn't stay in body. Check breathing, start CPR if needed. Call 112.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">⚠️</div><p>30-30 rule: if thunder comes within 30 seconds of lightning — get inside. Wait 30 minutes after last thunder before going out.</p></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- FIRE -->
+<div class="topic-section" id="tab-fire">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="fire outbreak aag lagna building">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🔥</div><div class="acc-title">Fire Outbreak — Building</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Alert & Get Out</h4><p>Shout "Fire!" loudly. Activate fire alarm if available. Leave immediately — don't waste time grabbing belongings.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Stay Low Under Smoke</h4><p>Smoke rises — crawl on hands and knees. Cover nose and mouth with wet cloth. Keep eyes low.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Check Door Before Opening</h4><p>Feel door with back of hand. If hot — don't open. Use another exit or signal from window for rescue.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Never Use Lifts</h4><p>Always use stairs. Lifts can malfunction or open onto fire floor.</p></div></div>
+        <div class="step"><div class="step-n">5</div><div class="step-c"><h4>Call 101 & Assemble</h4><p>Meet at pre-decided point outside. Call 101 (Fire) or 112. Never re-enter burning building.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">⚠️</div><p>Clothes on fire: STOP, DROP, ROLL. Running fans the flames.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="fire extinguisher pass method foam co2">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🧯</div><div class="acc-title">Fire Extinguisher — PASS Method</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">P</div><div class="step-c"><h4>Pull the Pin</h4><p>Pull the safety pin at the top of the extinguisher. This unlocks the handle.</p></div></div>
+        <div class="step"><div class="step-n">A</div><div class="step-c"><h4>Aim at Base</h4><p>Point the nozzle at the BASE of the fire — not the flames. This cuts the fuel source.</p></div></div>
+        <div class="step"><div class="step-n">S</div><div class="step-c"><h4>Squeeze Handle</h4><p>Squeeze the handle firmly and evenly to discharge. Keep squeezing continuously.</p></div></div>
+        <div class="step"><div class="step-n">S</div><div class="step-c"><h4>Sweep Side to Side</h4><p>Move nozzle from side to side covering entire base of fire. Continue until fire is out.</p></div></div>
+      </div>
+      <div class="tip"><div class="wi">💡</div><p>Only fight fire if: it's small, you have a clear exit behind you, and you know the extinguisher type. Never fight large fires — escape first.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="hotel fire evacuation exit emergency plan">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🏨</div><div class="acc-title">Hotel Fire Evacuation</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>On Check-In</h4><p>Immediately locate nearest fire exit from your room. Count the doors — you may need to crawl in smoke and count by touch.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Keep Room Key Card</h4><p>Take your key card when evacuating. If corridors are smoky — you may need to return to room and shelter in place.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Shelter in Room if Needed</h4><p>If corridor is filled with smoke: stay in room, seal gaps under door with wet towels, call front desk and 101. Signal from window.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="wildfire forest fire jungle aag">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🌲</div><div class="acc-title">Wildfire / Forest Fire</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Evacuate Immediately</h4><p>Don't underestimate wildfire speed — it can outrun a person. Leave when warned, not when you see flames.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Move Against Wind</h4><p>Fire travels in the direction of wind. Move perpendicular or against wind direction.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>If Surrounded</h4><p>Find lowest ground with least vegetation. Lie face down in a depression or ditch. Cover body with soil. Protect airway.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- VEHICLE -->
+<div class="topic-section" id="tab-vehicle">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="brake failure gaadi brake fail chalti">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🚗</div><div class="acc-title">Brake Failure</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Don't Panic</h4><p>Grip steering wheel firmly. Keep looking ahead. Panic causes accidents more than brake failure itself.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Downshift Gears</h4><p>Shift to lower gears immediately — this slows the vehicle using engine braking. Manual: go down to 2nd then 1st. Auto: use L or 1.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Pump the Brakes</h4><p>Pump brake pedal rapidly — this may build enough pressure for partial braking in hydraulic systems.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Handbrake Slowly</h4><p>Apply handbrake gradually — not suddenly — or vehicle will skid. Use to bring speed down slowly.</p></div></div>
+        <div class="step"><div class="step-n">5</div><div class="step-c"><h4>Find Escape Route</h4><p>Aim for uphill road, gravel, bushes, or open field to slow down. Honk continuously to warn others.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="car sinking water gaadi paani mein doobna">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🚙</div><div class="acc-title">Car Sinking in Water</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Stay Calm — You Have Time</h4><p>Car takes 60–120 seconds to sink fully. Don't waste those seconds panicking. Act systematically.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Seatbelt Off First</h4><p>Unbuckle seatbelt immediately. Don't wait. If jammed — cut with sharp object or window smasher.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Open Window Immediately</h4><p>Open window as soon as car hits water — electronics work for ~30 seconds. This is your exit. Don't open door yet.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Break Window if Needed</h4><p>Use headrest spike or heel of shoe at corner of window. Center of window is strongest — always hit corner.</p></div></div>
+        <div class="step"><div class="step-n">5</div><div class="step-c"><h4>Wait for Pressure to Equalize</h4><p>If door won't open — wait until inside water level equals outside, then door will open. Take a deep breath and exit fast.</p></div></div>
+      </div>
+      <div class="tip"><div class="wi">💡</div><p>Keep a window smasher/seatbelt cutter tool in your car's glove box. Under ₹200 — potentially life-saving.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="road accident witness bystander crash">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🚑</div><div class="acc-title">Road Accident — As a Witness</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Secure the Scene</h4><p>Park safely. Turn on hazard lights. Place warning triangle or have someone wave off traffic from 50m away.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Call 112 Immediately</h4><p>Give exact location, number of casualties, type of vehicle. Don't hang up — stay on line.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Don't Move Casualties</h4><p>Unless immediate danger (fire, water). Moving someone with spinal injury can cause paralysis. Wait for paramedics.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>You're Protected by Good Samaritan Law</h4><p>Indian law protects bystanders who help accident victims. You cannot be questioned, detained, or harassed by police for helping.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- MAN-MADE -->
+<div class="topic-section" id="tab-man">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="gas leak lpg cylinder regulator smell">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">💨</div><div class="acc-title">Gas Leak (LPG/CNG)</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Don't Touch Any Switch</h4><p>Even a light switch can spark. Don't switch on or off anything electrical — spark can ignite gas.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Open All Windows & Doors</h4><p>Ventilate immediately. Don't use fans — they're electrical. Open manually. Move away from gas smell area.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Turn Off Cylinder Valve</h4><p>Turn the knob on top of cylinder clockwise to close. Only if cylinder is accessible without going near flames.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Exit & Call Help</h4><p>Evacuate all people. Call from outside — 101 (Fire) or your gas supplier. Don't re-enter until cleared.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="terror attack active shooter run hide fight">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🚨</div><div class="acc-title">Terror Attack / Active Shooter</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">R</div><div class="step-c"><h4>RUN</h4><p>If there's an escape route — run. Leave belongings. Help others if safe to do so. Don't wait for others who won't come.</p></div></div>
+        <div class="step"><div class="step-n">H</div><div class="step-c"><h4>HIDE</h4><p>If you can't run — hide. Lock/barricade door. Silence phone. Turn off lights. Stay away from doors and windows.</p></div></div>
+        <div class="step"><div class="step-n">T</div><div class="step-c"><h4>TELL</h4><p>Call 100 (Police) when safe. Whisper location, description of attacker, number of shots heard, your location.</p></div></div>
+        <div class="step"><div class="step-n">F</div><div class="step-c"><h4>FIGHT (Last Resort)</h4><p>If cornered with no option — fight back aggressively. Use any object as weapon. Commit fully — half-hearted resistance is worse.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="building collapse structural triangle life">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🏗️</div><div class="acc-title">Building Collapse</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Drop & Cover Immediately</h4><p>Get under desk or sturdy table. Protect head and neck. Stay away from exterior walls and windows.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Triangle of Life Spots</h4><p>Next to (not under) sturdy furniture — when ceiling collapses on object, a void (triangle) forms beside it. This can save you.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>If Trapped</h4><p>Don't shout continuously — wastes energy. Tap on pipe or wall to signal rescuers. Shout only when you hear someone nearby.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Dust & Debris</h4><p>Cover nose with cloth. Breathe shallowly. Concrete dust inhalation is dangerous.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="stampede bhaag daud crowd crush">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">👥</div><div class="acc-title">Stampede</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Don't Fight the Crowd</h4><p>Move with the crowd initially. Fighting it causes injury. Wait for an opportunity to edge sideways toward a wall or edge.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Protect Your Chest Space</h4><p>Fold arms in front of chest (like boxing guard). This creates a breathing space even when crushed from all sides.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>If You Fall</h4><p>Curl into ball, protect head and chest, get up immediately — being on ground is most dangerous. Use your legs to push up.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Move Diagonally to Exit</h4><p>Once you find space — move diagonally toward edge or exit. Never go against crowd flow directly.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="industrial chemical disaster gas zehrili">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">☢️</div><div class="acc-title">Industrial / Chemical Disaster</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Move Against Wind</h4><p>Toxic gases travel with wind. Move perpendicular or upwind from the source. Don't run downwind.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Cover Nose & Mouth</h4><p>Use wet cloth as improvised filter. N95 mask if available. Don't use regular surgical masks — they don't filter chemicals.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Shelter in Place if Ordered</h4><p>If authorities say shelter in place: seal doors and windows with tape and wet cloth. Turn off HVAC. Wait for all-clear.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="nuclear radiation leak potassium iodide alert">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">☢️</div><div class="acc-title">Nuclear / Radiation Alert</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Follow Official Instructions ONLY</h4><p>Misinformation spreads fast. Follow only government/civil defense broadcasts. Don't act on rumors.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Get Inside</h4><p>Concrete/brick buildings block radiation. Go inside, close windows and doors, turn off HVAC. Distance and shielding are protection.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Potassium Iodide if Issued</h4><p>Take KI tablets only if distributed by health authorities — they protect the thyroid gland only from radioactive iodine. Take correct dose.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">⚠️</div><p>Do not take Potassium Iodide without official instruction — it has serious side effects and doesn't protect against all radiation.</p></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- CLIMATE -->
+<div class="topic-section" id="tab-climate">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="extreme heatwave garmi 45 degree temperature power grid">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🥵</div><div class="acc-title">Extreme Heatwave (45°C+)</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Stay Indoors 12–4 PM</h4><p>Peak heat hours. If you must go out — cotton/light clothes, hat, sunglasses, water. Never leave children or elderly alone indoors without ventilation.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Hydrate Constantly</h4><p>Drink water even if not thirsty — thirst lags behind dehydration. ORS or lemon salt water better than plain water in extreme heat.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Power Grid Failure</h4><p>Keep phone charged before outage. Wet sheet + fan creates cooling even in power cut. Identify nearest cooling center (government hospitals, malls).</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Check on Vulnerable People</h4><p>Elderly, infants, outdoor workers are at highest risk. Check on neighbors. Heatstroke can be silent until collapse.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="smog air pollution aqi bad air quality n95 mask">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">😷</div><div class="acc-title">Toxic Smog / Air Pollution Emergency</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Check AQI Before Going Out</h4><p>AQI above 200 = very unhealthy. Above 300 = hazardous. Use SAFAR app (India) or IQAir for real-time reading.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Use N95/N99 Mask</h4><p>Regular surgical masks don't filter PM2.5 particles. Only N95 or better provides real protection. Fit tightly — no gaps.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Stay Indoors</h4><p>Keep windows closed during peak pollution. Wet mopping reduces indoor dust. Indoor plants help marginally — don't rely on them alone.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>At-Risk Groups</h4><p>Asthma, heart patients, children, elderly must avoid all outdoor activity above AQI 150. Keep inhalers accessible.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="blizzard extreme cold carbon monoxide snow">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">❄️</div><div class="acc-title">Blizzard / Extreme Cold</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Stay Inside</h4><p>Don't travel in blizzard conditions unless emergency. More people die of exposure trying to travel than staying put.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Carbon Monoxide Warning</h4><p>Never use generators, grills, or kerosene heaters inside — they produce deadly CO gas. Colorless, odorless, kills silently. Keep one window slightly open.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>If Stranded in Vehicle</h4><p>Stay in car — it's shelter. Run engine 10 minutes per hour for warmth. Keep window cracked for ventilation. Clear exhaust pipe of snow.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="cyber blackout power outage offline maps city">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🔌</div><div class="acc-title">City-Wide Blackout / Cyber Failure</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Download Offline Maps Now</h4><p>Before emergency: download Google Maps or Maps.me for your city offline. Works without internet — essential during blackouts.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Keep Cash Ready</h4><p>ATMs and digital payments fail in blackouts. Always keep ₹500–2000 cash at home for emergencies.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Power Bank & Candles</h4><p>Keep a charged power bank and candles/torch at home always. Recharge power bank every month even if unused.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- MISC -->
+<div class="topic-section" id="tab-misc">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="child missing bachha gum lost kid">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🚸</div><div class="acc-title">Child Missing</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Search Immediately — Don't Wait</h4><p>Search nearby area for 5 minutes. Call out their name. Check all bathrooms, corners, under furniture — first.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Alert Security/Staff</h4><p>If in a mall, station, or public place — alert security immediately. They have protocols and cameras.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Call 112 / Childline 1098</h4><p>File a missing person report immediately — no waiting period required for children. Childline: 1098 (free, 24/7).</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Share Photo Immediately</h4><p>Have a recent photo on your phone always. Share with police, WhatsApp groups, and station CCTV teams immediately.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="lost passport abroad documents embassy">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">✈️</div><div class="acc-title">Lost Passport / Documents Abroad</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>File Police Report First</h4><p>Go to local police station and file FIR. This report is essential for emergency travel document from Indian Embassy.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Contact Indian Embassy / Consulate</h4><p>Find nearest Indian Embassy. Carry: police report, any ID proof, passport-size photos. They can issue Emergency Certificate for return travel.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Contact Bank</h4><p>Block cards immediately via app or call. International transfers via Western Union/MoneyGram if completely stranded.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Prevention</h4><p>Always keep: digital copies on email/cloud, photocopy of passport in luggage, note of embassy number before traveling.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="emergency kit checklist bag ready ghar">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🎒</div><div class="acc-title">Emergency Kit — Home Checklist</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Documents</h4><p>Photocopies of Aadhar, PAN, passport, bank passbook, insurance. Keep in waterproof zip-lock bag.</p></div></div>
+        <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Water & Food</h4><p>3-day supply: 4 litres water per person per day, dry food (biscuits, chikki, energy bars, ORS packets).</p></div></div>
+        <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>First Aid</h4><p>Bandages, antiseptic, pain relievers (paracetamol), ORS, scissors, gloves, personal medicines (minimum 1 week supply).</p></div></div>
+        <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Tools & Power</h4><p>Torch + extra batteries, power bank (charged), whistle, portable radio (battery), cash ₹2000+, lighter/matches.</p></div></div>
+        <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Contacts List</h4><p>Written (not just on phone) list: family numbers, doctor, neighbor, local police station, nearest hospital.</p></div></div>
+      </div>
+      <div class="tip"><div class="wi">💡</div><p>Check and refresh this kit every 6 months. Replace expired food, medicines, and recharge power bank.</p></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+</div>
+<script>
+function showTab(id, el) {
+  document.querySelectorAll('.acc-item').forEach(i => { i.style.display = ''; i.classList.remove('open'); });
+  document.querySelectorAll('.topic-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('searchInput').value = '';
+  document.getElementById('noResult').style.display = 'none';
+}
+function toggleAcc(header) { header.parentElement.classList.toggle('open'); }
+function doSearch() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  if (!q) {
+    document.querySelectorAll('.acc-item').forEach(i => { i.style.display = ''; i.classList.remove('open'); });
+    document.querySelectorAll('.topic-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('tab-natural').classList.add('active');
+    document.querySelectorAll('.tab').forEach((t,i) => { t.classList.remove('active'); if(i===0) t.classList.add('active'); });
+    document.getElementById('noResult').style.display = 'none';
+    return;
+  }
+  document.querySelectorAll('.topic-section').forEach(s => s.classList.add('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  let found = 0;
+  document.querySelectorAll('.acc-item').forEach(item => {
+    const kw = (item.dataset.keywords||'').toLowerCase();
+    const title = item.querySelector('.acc-title').textContent.toLowerCase();
+    const body = item.querySelector('.acc-body').textContent.toLowerCase();
+    if (kw.includes(q)||title.includes(q)||body.includes(q)) { item.style.display=''; item.classList.add('open'); found++; }
+    else { item.style.display='none'; }
+  });
+  document.getElementById('noResult').style.display = found===0 ? 'block' : 'none';
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const tab = params.get("tab");
+  if (tab) {
+    const targetSection = document.getElementById("tab-" + tab);
+    if (targetSection) {
+      document.querySelectorAll(".topic-section").forEach(s => s.classList.remove("active"));
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      targetSection.classList.add("active");
+      document.querySelectorAll(".tab").forEach(btn => {
+        const oc = btn.getAttribute("onclick") || "";
+        if (oc.includes("'" + tab + "'")) btn.classList.add("active");
+      });
+    }
+  }
+});
+</script>
+</body>
+</html>

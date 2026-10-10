@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>LifeKit — First Aid</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0c10;
+      --surface: #111418;
+      --card: #161b22;
+      --border: rgba(255,255,255,0.07);
+      --accent: #ff3b3b;
+      --accent2: #ff7c3b;
+      --text: #f0f4f8;
+      --muted: #6b7280;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; padding-bottom:48px; }
+
+    /* TOP BAR */
+    .top-bar {
+      display:flex; align-items:center; gap:14px;
+      padding:52px 20px 16px;
+      position:sticky; top:0;
+      background:rgba(10,12,16,0.94);
+      backdrop-filter:blur(14px);
+      z-index:100;
+      border-bottom:1px solid var(--border);
+    }
+    .back-btn {
+      width:38px; height:38px;
+      background:var(--card); border:1px solid var(--border);
+      border-radius:12px; display:flex; align-items:center; justify-content:center;
+      font-size:18px; text-decoration:none; color:var(--text); flex-shrink:0;
+    }
+    .back-btn:active { background:var(--surface); }
+    .top-title { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:2px; color:var(--accent); }
+
+    /* HERO */
+    .hero { padding:24px 20px 16px; animation:fadeUp 0.5s ease forwards; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+    .hero-label { font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
+    .hero h1 { font-size:26px; font-weight:600; line-height:1.2; margin-bottom:6px; }
+    .hero p { font-size:13px; color:var(--muted); line-height:1.6; }
+
+    /* SEARCH */
+    .search-wrap { padding:0 20px 14px; }
+    .search-box {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:14px; display:flex; align-items:center; gap:10px; padding:12px 16px;
+    }
+    .search-box span { font-size:15px; opacity:0.4; }
+    .search-box input { background:none; border:none; outline:none; color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; flex:1; }
+    .search-box input::placeholder { color:var(--muted); }
+
+    /* TABS */
+    .tabs-wrap { overflow-x:auto; padding:0 20px 4px; scrollbar-width:none; }
+    .tabs-wrap::-webkit-scrollbar { display:none; }
+    .tabs { display:flex; gap:8px; width:max-content; }
+    .tab {
+      padding:8px 14px; border-radius:20px; border:1px solid var(--border);
+      background:var(--card); font-size:12px; font-weight:500; color:var(--muted);
+      cursor:pointer; white-space:nowrap; transition:all 0.2s; -webkit-user-select:none;
+    }
+    .tab.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+
+    /* CONTENT */
+    .content-area { padding:16px 20px; }
+    .topic-section { display:none; }
+    .topic-section.active { display:block; animation:fadeUp 0.3s ease; }
+
+    /* ACCORDION */
+    .accordion { display:flex; flex-direction:column; gap:10px; }
+    .acc-item {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:16px; overflow:hidden;
+    }
+    .acc-header {
+      display:flex; align-items:center; gap:12px;
+      padding:16px; cursor:pointer; -webkit-user-select:none;
+    }
+    .acc-header:active { background:rgba(255,255,255,0.03); }
+    .acc-icon { font-size:22px; flex-shrink:0; }
+    .acc-title { font-size:15px; font-weight:600; flex:1; }
+    .acc-arrow { font-size:12px; color:var(--muted); transition:transform 0.25s; flex-shrink:0; }
+    .acc-item.open .acc-arrow { transform:rotate(180deg); }
+    .acc-body { display:none; padding:0 16px 16px; }
+    .acc-item.open .acc-body { display:block; animation:fadeUp 0.25s ease; }
+
+    /* STEPS inside accordion */
+    .steps { display:flex; flex-direction:column; gap:10px; margin-top:4px; }
+    .step {
+      display:flex; gap:12px; align-items:flex-start;
+      background:rgba(255,59,59,0.04); border:1px solid rgba(255,59,59,0.1);
+      border-radius:12px; padding:12px;
+    }
+    .step-n {
+      width:26px; height:26px; border-radius:50%;
+      background:rgba(255,59,59,0.12); border:1px solid rgba(255,59,59,0.25);
+      color:var(--accent); font-family:'Bebas Neue',sans-serif; font-size:15px;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    }
+    .step-c h4 { font-size:14px; font-weight:600; margin-bottom:3px; }
+    .step-c p  { font-size:12px; color:var(--muted); line-height:1.5; }
+
+    /* WARN / TIP */
+    .warn {
+      background:rgba(255,59,59,0.07); border:1px solid rgba(255,59,59,0.2);
+      border-radius:12px; padding:12px 14px; margin-top:12px;
+      display:flex; gap:10px; align-items:flex-start;
+    }
+    .warn p { font-size:12px; color:#ff8080; line-height:1.5; }
+    .tip {
+      background:rgba(59,138,255,0.07); border:1px solid rgba(59,138,255,0.2);
+      border-radius:12px; padding:12px 14px; margin-top:10px;
+      display:flex; gap:10px; align-items:flex-start;
+    }
+    .tip p { font-size:12px; color:#80b8ff; line-height:1.5; }
+    .wi { font-size:16px; flex-shrink:0; }
+
+    /* NO RESULT */
+    .no-result { text-align:center; padding:40px 20px; color:var(--muted); font-size:14px; display:none; }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a class="back-btn" href="frontpage.html">←</a>
+  <div class="top-title">🩹 First Aid</div>
+</div>
+
+<div class="hero">
+  <div class="hero-label">Emergency Medical Guide</div>
+  <h1>First Aid<br>Essentials</h1>
+  <p>Step-by-step help for every medical emergency. Act fast — every second matters.</p>
+</div>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <span>🔍</span>
+    <input type="text" id="searchInput" placeholder="Search topics... e.g. CPR, snake bite" oninput="doSearch()" />
+  </div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('cardiac',this)">❤️ Cardiac</div>
+    <div class="tab" onclick="showTab('wounds',this)">🩸 Wounds</div>
+    <div class="tab" onclick="showTab('breathing',this)">🌬️ Breathing</div>
+    <div class="tab" onclick="showTab('trauma',this)">🦴 Trauma</div>
+    <div class="tab" onclick="showTab('bites',this)">🐍 Bites</div>
+    <div class="tab" onclick="showTab('medical',this)">💊 Medical</div>
+    <div class="tab" onclick="showTab('neuro',this)">🧠 Neuro</div>
+    <div class="tab" onclick="showTab('other',this)">➕ Other</div>
+  </div>
+</div>
+
+<div class="content-area">
+<div class="no-result" id="noResult">No topics found. Try a different keyword.</div>
+
+<!-- CARDIAC -->
+<div class="topic-section active" id="tab-cardiac">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="cardiac arrest cpr heart stop breathing">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">🫀</div>
+      <div class="acc-title">Cardiac Arrest</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Check Response</h4><p>Tap shoulders, shout "Are you okay?" No response + no normal breathing = cardiac arrest. Call 112 immediately.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Start CPR</h4><p>Place heel of both hands on center of chest. Push hard & fast — at least 5 cm deep, 100–120 times per minute. Let chest fully rise between compressions.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Give Rescue Breaths</h4><p>After 30 compressions: tilt head back, lift chin, pinch nose, give 2 breaths of 1 second each. Chest should visibly rise.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Use AED if Available</h4><p>Switch on AED, attach pads to bare chest as shown. Follow voice instructions. Resume CPR immediately after shock.</p></div></div>
+        <div class="step"><div class="step-n">5</div><div class="step-c"><h4>Keep Going</h4><p>Don't stop until paramedics arrive or person starts breathing normally. Swap with another person every 2 minutes if possible.</p></div></div>
+      </div>
+      <div class="tip"><div class="wi">💡</div><p>Hum "Stayin' Alive" mentally — it's exactly 100 BPM. Perfect CPR rhythm.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="heart attack chest pain angina">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">💔</div>
+      <div class="acc-title">Heart Attack</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Recognize Signs</h4><p>Chest pain or tightness, pain spreading to arm/jaw/neck, sweating, nausea, shortness of breath, feeling of doom.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Call 112 Immediately</h4><p>Don't wait. Don't drive yourself. Lie or sit in most comfortable position — usually half-sitting, knees bent.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Give Aspirin</h4><p>If conscious and not allergic — give 300mg aspirin to chew (not swallow whole). This reduces clot damage.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Stay Calm & Monitor</h4><p>Loosen tight clothing. Keep them calm and still. Monitor breathing. If they lose consciousness — start CPR.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">⚠️</div><p>Heart attack ≠ Cardiac arrest. Heart attack: heart is struggling. Cardiac arrest: heart has stopped. CPR needed only in arrest.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="stroke face drooping arm weakness speech fast">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">🧠</div>
+      <div class="acc-title">Stroke — FAST Method</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">F</div><div class="step-c"><h4>Face Drooping</h4><p>Ask to smile — is one side drooping or numb? Uneven smile = warning sign.</p></div></div>
+        <div class="step"><div class="step-n">A</div><div class="step-c"><h4>Arm Weakness</h4><p>Ask to raise both arms — does one drift downward? Can't hold both up = warning sign.</p></div></div>
+        <div class="step"><div class="step-n">S</div><div class="step-c"><h4>Speech Difficulty</h4><p>Ask to repeat "The sky is blue" — is speech slurred, strange, or they can't speak? = warning sign.</p></div></div>
+        <div class="step"><div class="step-n">T</div><div class="step-c"><h4>Time to Call 112</h4><p>If ANY one sign is present — call 112 immediately. Note exact time symptoms started. Brain cells die every minute.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">⚠️</div><p>Do NOT give food, water, or medicine to a stroke patient. They may have lost ability to swallow safely.</p></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- WOUNDS -->
+<div class="topic-section" id="tab-wounds">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="bleeding wound cut blood severe">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">🩸</div>
+      <div class="acc-title">Severe Bleeding</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Protect Yourself</h4><p>Wear gloves if available. Use plastic bag or extra cloth to avoid direct blood contact.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Apply Direct Pressure</h4><p>Press firmly with clean cloth. Don't remove — add more on top if soaked. Hold for minimum 10 minutes without lifting.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Elevate the Limb</h4><p>Raise injured arm or leg above heart level. Gravity slows blood flow significantly.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Tourniquet if Life-Threatening</h4><p>Limb only. Tie 5–7 cm above wound using cloth strip. Tighten until bleeding stops. Write time on skin. Loosen after 2 hrs max.</p></div></div>
+        <div class="step"><div class="step-n">5</div><div class="step-c"><h4>Seek Emergency Help</h4><p>All deep or gushing wounds need hospital. Call 112 if bleeding won't stop after 15 minutes.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">⚠️</div><p>Never remove an embedded object (glass, knife). Stabilize it in place — removing it can cause massive hemorrhage.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="burns fire jalna chemical thermal">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">🔥</div>
+      <div class="acc-title">Burns — Thermal, Chemical & Electrical</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Cool the Burn</h4><p>Run cool (not ice cold) water over burn for 10–20 minutes. This is the most important step — don't skip it.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Remove Clothing & Jewelry</h4><p>Carefully remove items around burn — but never peel off anything stuck to skin.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Cover Loosely</h4><p>Wrap loosely with clean non-fluffy material or cling film. Don't wrap tight — burns swell.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Chemical Burns</h4><p>Brush off dry chemical first. Then flush with large amounts of water for 20+ minutes. Remove contaminated clothing carefully.</p></div></div>
+        <div class="step"><div class="step-n">5</div><div class="step-c"><h4>Electrical Burns</h4><p>Disconnect power first. Even small entry wound can have serious internal damage — always get hospital evaluation.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">🚫</div><p>NEVER: butter, toothpaste, oil, ice, or any cream on burns. They trap heat and cause infection.</p></div>
+      <div class="tip"><div class="wi">💡</div><p>Seek emergency help: burns larger than palm, face/hands/genitals burns, blistering, or child burns.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="amputation cut off limb ang kat gaya">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">✂️</div>
+      <div class="acc-title">Amputation</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Control Bleeding First</h4><p>Apply tourniquet above amputation site immediately. Press firmly. Time is critical.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Preserve the Severed Part</h4><p>Wrap in clean damp cloth or gauze. Place in clean plastic bag. Then place that bag in ice-cold water. Do NOT put directly on ice.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Rush to Hospital</h4><p>Bring the severed part immediately. Reattachment is possible within 4–6 hours if properly preserved. Call 112.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">⚠️</div><p>Do not soak the amputated part in water or place directly on ice — it destroys tissue.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="nosebleed naak se khoon epistaxis">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">👃</div>
+      <div class="acc-title">Nosebleed</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Lean Forward</h4><p>Sit upright, lean slightly forward (not back). Leaning back causes blood to flow into throat — choking risk.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Pinch the Soft Part</h4><p>Pinch the soft lower part of nose (not the bridge). Hold for 10–15 minutes without releasing. Breathe through mouth.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Apply Cold Compress</h4><p>Hold a cold cloth or ice pack on the bridge of nose to help constrict blood vessels.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">⚠️</div><p>Seek help if: bleeding doesn't stop after 20 minutes, after head injury, or if blood loss is large.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="eye injury chemical splash aankh">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">👁️</div>
+      <div class="acc-title">Eye Injury & Chemical Splash</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Flush Immediately</h4><p>For chemical splash: flush with clean water for 20 full minutes. Hold eye open under gentle running water. Don't rub.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Foreign Object</h4><p>Don't rub. Blink rapidly — tear may flush it out. Pull upper lid over lower. If still stuck — cover eye and seek doctor.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Penetrating Object</h4><p>Do NOT remove it. Cover both eyes gently with clean cloth (covering both reduces eye movement). Seek emergency immediately.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">⚠️</div><p>Never try to remove an object embedded in the eye. You can cause permanent blindness.</p></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- BREATHING -->
+<div class="topic-section" id="tab-breathing">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="choking gala phasna heimlich maneuver">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">🫁</div>
+      <div class="acc-title">Choking — Heimlich Maneuver</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Assess First</h4><p>If they can cough, speak, or breathe — encourage coughing. Don't intervene yet. If they can't — act immediately.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>5 Back Blows</h4><p>Lean forward, support chest. Strike firmly between shoulder blades 5 times with heel of palm.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>5 Abdominal Thrusts</h4><p>Stand behind, make fist just above navel, grab with other hand. Pull sharply inward and upward 5 times.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Repeat & Call 112</h4><p>Alternate 5 back blows and 5 thrusts until object dislodges or they lose consciousness. If unconscious — start CPR.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">⚠️</div><p>For infants under 1 year: use 5 back blows + 5 chest thrusts (NOT abdominal thrusts). Never do blind finger sweep.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="asthma attack inhaler breathing saans">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">💨</div>
+      <div class="acc-title">Asthma Attack</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Sit Upright</h4><p>Help them sit upright, leaning slightly forward. Don't lay them down. Loosen tight clothing around chest and neck.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Use Inhaler</h4><p>Give reliever inhaler (usually blue) — 1 puff every 30–60 seconds, up to 10 puffs. Use spacer if available.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Stay Calm</h4><p>Panic worsens breathing. Speak calmly. If no improvement after 10 puffs — call 112 immediately.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>No Inhaler Available</h4><p>Sit upright, slow breathing through pursed lips. Remove from triggers (smoke, dust). Call 112 immediately.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">⚠️</div><p>Call 112 if: lips turn blue, can't complete sentences, no improvement after inhaler, or attack is severe.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="drowning paani mein doobna">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">🌊</div>
+      <div class="acc-title">Drowning</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Get Them Out Safely</h4><p>Don't jump in unless trained. Throw rope, clothing, or extend a stick. Pull them to safety without putting yourself at risk.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Call 112</h4><p>Call immediately. Even if they seem fine — water in lungs can cause delayed collapse (secondary drowning) hours later.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Check Breathing</h4><p>If not breathing — tilt head back, lift chin, start rescue breathing. Give 5 initial breaths then begin CPR 30:2.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Recovery Position</h4><p>If breathing — turn on side, tilt head back to keep airway open. Keep warm — hypothermia risk after water rescue.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">⚠️</div><p>Do NOT try to drain water before CPR. Start CPR immediately — it's far more important.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="allergic reaction anaphylaxis epipen swelling saans">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">🤧</div>
+      <div class="acc-title">Allergic Reaction — Anaphylaxis</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Recognize It Fast</h4><p>Hives/rash + swelling of face/throat + difficulty breathing + rapid pulse + dizziness = anaphylaxis. Life-threatening. Act NOW.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Use EpiPen if Available</h4><p>Inject into outer thigh (even through clothes). Hold for 10 seconds. Call 112 even after injection — effects last only 15–20 minutes.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Lay Them Down</h4><p>Lie flat with legs raised (unless breathing is difficult — then sit up). Keep still and calm until help arrives.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>CPR if Needed</h4><p>If they lose consciousness and stop breathing — begin CPR immediately.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- TRAUMA -->
+<div class="topic-section" id="tab-trauma">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="fracture sprain broken bone haddi">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">🦴</div>
+      <div class="acc-title">Fracture & Sprain</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Stop & Immobilize</h4><p>Don't try to realign the bone. Stop all movement of the injured area immediately.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Splint It</h4><p>Use rigid material (rolled newspaper, stick, cardboard) padded with cloth on both sides of fracture. Secure above and below injury point.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Ice & Elevate</h4><p>Apply ice wrapped in cloth — not directly on skin. Elevate if limb. This reduces swelling and pain.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Seek Help</h4><p>All suspected fractures need X-ray. Don't let patient walk on a suspected leg fracture. Call 112 for severe cases.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">⚠️</div><p>Open fracture (bone visible through skin): cover with clean cloth, don't push bone back, call 112 immediately.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="spinal neck injury reedh ki haddi">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">🏥</div>
+      <div class="acc-title">Spinal & Neck Injury</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Do NOT Move Them</h4><p>Any movement can cause permanent paralysis. Keep them absolutely still unless there's immediate life threat (fire, water).</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Stabilize the Head</h4><p>Hold head gently in position you found it — don't straighten it. Use both hands to keep it absolutely still.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Call 112</h4><p>Describe mechanism of injury. Wait for trained paramedics — they have specialized equipment for safe transport.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">⚠️</div><p>Suspect spinal injury after: falls from height, high-speed accidents, diving accidents, or unconscious trauma patient.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="heatstroke sunstroke lu lagna overheating garmi">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">☀️</div>
+      <div class="acc-title">Heatstroke / Sunstroke (Lu Lagna)</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Move to Cool Area</h4><p>Get them into shade or air-conditioned space immediately. Remove excess clothing.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Cool the Body Fast</h4><p>Apply wet cloth to neck, armpits, and groin. Fan them. Use ice packs wrapped in cloth. Sponge with cool water.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Hydrate if Conscious</h4><p>If conscious and can swallow — give water or ORS (not very cold). Never force fluids on unconscious person.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Call 112</h4><p>Heatstroke (not heat exhaustion) is life-threatening. Confusion, no sweating, temp above 40°C = emergency.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">⚠️</div><p>Heat exhaustion: heavy sweating, weakness. Heatstroke: hot dry skin, confusion — far more dangerous. Both need cooling, heatstroke needs 112.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="frostbite hypothermia thand freezing">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">🥶</div>
+      <div class="acc-title">Frostbite & Hypothermia</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Move to Warmth</h4><p>Get to a warm, dry shelter. Remove wet clothing. Wrap in blankets, especially around core, head, and neck.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Rewarm Frostbitten Area</h4><p>Soak in warm (not hot) water 37–40°C for 15–30 minutes. Stop when skin turns pink and feeling returns.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Do NOT Rub</h4><p>Never rub frostbitten skin — ice crystals inside can tear tissue. Handle gently. Cover with sterile bandage.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Give Warm Drinks</h4><p>If conscious — warm (not hot) sweet drinks. No alcohol. Call 112 for severe hypothermia (unconscious, shivering stopped).</p></div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- BITES -->
+<div class="topic-section" id="tab-bites">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="snake bite saanp zeher venom">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">🐍</div>
+      <div class="acc-title">Snake Bite</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Stay Calm & Keep Still</h4><p>Movement speeds venom spread. Sit or lie down. Keep bitten limb below heart level. Do NOT run.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Remove Constrictions</h4><p>Remove rings, watches, tight clothing near bite — swelling will come fast.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Call 112 & Note the Snake</h4><p>If safe, take a photo or remember color/pattern — helps doctors give correct antivenom. Don't try to catch it.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Rush to Hospital</h4><p>Antivenom is the only real treatment. Get there as fast as possible. Keep patient still during transport.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">🚫</div><p>NEVER: cut the wound, suck venom, apply tourniquet, apply ice. These are dangerous myths.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="dog bite monkey bite rabies animal kutte ka kaatna">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">🐕</div>
+      <div class="acc-title">Dog & Monkey Bites — Rabies Prevention</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Wash Wound Immediately</h4><p>Wash with soap and running water for 15 minutes minimum. This is the most important step — reduces rabies risk significantly.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Apply Antiseptic</h4><p>Apply povidone-iodine or 70% alcohol after washing. Cover with clean bandage.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Get Anti-Rabies Vaccine</h4><p>Go to hospital within 24 hours. 5-dose vaccine schedule: Day 0, 3, 7, 14, 28. Don't skip doses — rabies is fatal once symptoms appear.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>RIG if Deep Wound</h4><p>For deep/multiple bites — doctor may give Rabies Immunoglobulin (RIG) at wound site on Day 0. Very important.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">⚠️</div><p>Rabies is 100% fatal once symptoms appear. Vaccine after bite works — but only if given before symptoms start.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="insect bee sting keede ka kaatna">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">🐝</div>
+      <div class="acc-title">Insect Bites & Bee Stings</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Remove Stinger</h4><p>Scrape stinger out sideways with a card or fingernail — don't pinch/squeeze (releases more venom).</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Wash & Cool</h4><p>Wash with soap and water. Apply ice pack for 10–15 minutes to reduce pain and swelling.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Monitor for Allergy</h4><p>Watch for 30 minutes: hives, swelling spreading, difficulty breathing = anaphylaxis emergency. Call 112.</p></div></div>
+      </div>
+      <div class="tip"><div class="wi">💡</div><p>Multiple bee stings (50+) can cause toxic reaction even without allergy. Always seek medical help for mass stings.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="pet stray animal first aid cat dog">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">🐾</div>
+      <div class="acc-title">Pet / Stray Animal First Aid</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Approach Safely</h4><p>An injured animal may bite out of fear. Approach slowly, speak softly. Use a cloth or jacket to cover the animal's head first.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Control Bleeding</h4><p>Apply gentle pressure with clean cloth on wounds. Don't use elastic bands — can cut off circulation.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Don't Feed or Give Water</h4><p>Injured animals may vomit or have internal injuries. No food or water until vet evaluation.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Transport to Vet</h4><p>Carry in a box lined with cloth. Call local animal helpline (PFA: 1962 in many cities). Keep animal warm and calm.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- MEDICAL -->
+<div class="topic-section" id="tab-medical">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="poisoning overdose zeher galat dawai">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">☠️</div>
+      <div class="acc-title">Poisoning & Overdose</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Call 112 First</h4><p>Note what was ingested, how much, and when. Tell this to 112 — they can advise over the phone.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Do NOT Induce Vomiting</h4><p>Unless specifically told by doctor/poison control. For corrosives (acids, bleach) — vomiting causes more damage coming back up.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>If Unconscious</h4><p>Place in recovery position. Keep airway clear. Do not give anything by mouth. Monitor breathing.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Bring the Container</h4><p>Take the medicine bottle, plant, or substance to hospital — doctors need to identify the exact poison.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">⚠️</div><p>For alcohol/drug overdose: don't let them "sleep it off" alone. Monitor continuously — people die from airway obstruction.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="diabetic emergency sugar blood low high hypoglycemia">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">🩺</div>
+      <div class="acc-title">Diabetic Emergency</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Low Blood Sugar (Hypoglycemia)</h4><p>Signs: shaking, sweating, confusion, pale, fast heartbeat. Give: sugar, juice, glucose tablet, or sweet drink immediately if conscious.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>High Blood Sugar (Hyperglycemia)</h4><p>Signs: extreme thirst, frequent urination, fruity breath, confusion. Give water if conscious. Needs hospital for insulin — don't delay.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>If Unconscious</h4><p>Do NOT give anything by mouth — choking risk. Recovery position. Call 112. Don't leave alone.</p></div></div>
+      </div>
+      <div class="tip"><div class="wi">💡</div><p>When unsure: give sugar anyway. Giving sugar to a high-sugar patient is less dangerous than not giving it to a low-sugar patient.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="high fever kids bacche bukhar temperature">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">🌡️</div>
+      <div class="acc-title">High Fever in Children</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Measure Temperature</h4><p>Above 38°C is fever. Above 40°C is high fever — needs immediate action. Above 41°C = emergency.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Cool the Child</h4><p>Remove excess clothing. Sponge with lukewarm (not cold) water on forehead, armpits, neck. Fan gently.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Give Fever Medicine</h4><p>Paracetamol (Calpol) at correct weight-based dose. Give fluids — breast milk, water, ORS. Never give aspirin to children.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Febrile Seizure</h4><p>If child shakes/convulses: lay on side, don't restrain, don't put anything in mouth, clear area. Call 112. Usually stops in 1–2 min.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="vomit blood muh se khoon">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">🩸</div>
+      <div class="acc-title">Vomiting or Spitting Blood</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Call 112 Immediately</h4><p>Vomiting blood is always serious. It indicates internal bleeding — upper digestive tract, stomach ulcer, or serious injury.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Recovery Position</h4><p>Lay on left side to prevent choking. Keep airway clear. Don't give food or water.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Monitor & Reassure</h4><p>Keep calm. Note time, amount, and color of blood — this helps doctors. Stay with patient until help arrives.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- NEURO -->
+<div class="topic-section" id="tab-neuro">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="seizure convulsion fits mirgi epilepsy">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">⚡</div>
+      <div class="acc-title">Seizure / Convulsion (Mirgi)</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Stay Calm & Time It</h4><p>Note exact time seizure started. Most end in 1–3 minutes on their own. Stay close and watch.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Protect From Injury</h4><p>Clear hard/sharp objects away. Place something soft under the head. Do NOT restrain their movements.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Do NOT Put Anything in Mouth</h4><p>Old myth — people cannot swallow their tongue. Putting objects in mouth causes broken teeth, injured jaw, and injury to helper.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>After Seizure</h4><p>Turn on side (recovery position). They may be confused for minutes — speak gently. Stay with them until fully alert.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">⚠️</div><p>Call 112 if: seizure lasts more than 5 minutes, person doesn't regain consciousness, multiple seizures occur, or it's a first-ever seizure.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="fainting unconscious chakkar behosh">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">😵</div>
+      <div class="acc-title">Fainting & Unconsciousness</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>If They Feel Faint</h4><p>Sit or lie down immediately. Legs up above heart level. Loosen tight clothing. Move to cool, fresh air area.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>If They've Collapsed</h4><p>Check response — call name, tap shoulder. Open airway — tilt head back, lift chin. Check breathing for 10 seconds.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Recovery Position</h4><p>If breathing — roll onto left side, tilt head back to maintain airway. This prevents choking if they vomit.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Not Breathing — CPR</h4><p>If no breathing after head tilt — begin CPR immediately. Call 112.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="panic attack anxiety tezi se saans">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">😰</div>
+      <div class="acc-title">Panic Attack</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Reassure Them</h4><p>Say clearly: "You are safe. This will pass. I'm here with you." Panic attacks feel like dying but are not physically dangerous.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Breathing Technique</h4><p>Guide: breathe in slowly for 4 counts, hold for 4, out for 4. Repeat. This physically calms the nervous system.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Grounding — 5-4-3-2-1</h4><p>Ask: name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, 1 you taste. Brings focus back to present.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Don't Leave Them Alone</h4><p>Stay calm yourself — anxiety is contagious. Remove from crowded or stimulating environment if possible.</p></div></div>
+      </div>
+      <div class="tip"><div class="wi">💡</div><p>Don't say "calm down" or "it's nothing." Say "I'm here, you're safe, this will pass" — much more effective.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="suicidal mental health crisis depression">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">🧠</div>
+      <div class="acc-title">Suicidal Ideation / Mental Health Crisis</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Take It Seriously</h4><p>Never dismiss or say "you're just seeking attention." Any mention of suicide must be taken seriously. Your response matters.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Ask Directly</h4><p>It is safe to ask: "Are you thinking about ending your life?" Asking does not plant the idea — it opens a door for them to speak.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Listen Without Judging</h4><p>Don't offer quick solutions. Don't say "you have so much to live for." Just listen and stay present. Your presence is the help.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Connect to Help</h4><p>iCall: 9152987821 | Vandrevala Foundation: 1860-2662-345 (24/7) | NIMHANS: 080-46110007. Stay with them until help arrives.</p></div></div>
+      </div>
+      <div class="warn"><div class="wi">⚠️</div><p>If immediate danger: remove access to means (medicines, sharp objects). Don't leave alone. Call 112 if needed.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="ptsd trauma flashback post traumatic">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">💭</div>
+      <div class="acc-title">PTSD Flashback — Grounding Someone</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Stay Calm Yourself</h4><p>Speak in a low, steady voice. Don't touch without permission — sudden touch can worsen the flashback. Announce your actions.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Orient to Present</h4><p>Say: "You are safe. You are here with me in [place]. It is [year]. What you're experiencing is a memory — not happening now."</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Grounding Technique</h4><p>Guide them: feel your feet on the floor, feel the chair, name 5 things in this room. Physical sensations pull them back to present.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>After They're Grounded</h4><p>Don't ask about what happened. Offer water, sit with them. Encourage professional support if episodes are recurring.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- OTHER -->
+<div class="topic-section" id="tab-other">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="electric shock current lagna">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">⚡</div>
+      <div class="acc-title">Electric Shock First Aid</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Don't Touch the Victim</h4><p>You will be shocked too. Disconnect power at mains switch first. Use dry wooden stick or rubber to push wire away if needed.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Check & Start CPR</h4><p>Once safe — check breathing. If not breathing — start CPR immediately. Electric shock can stop the heart.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Treat Burns</h4><p>Electric burns have entry and exit wounds — check both. Cool burn areas with water. Cover with clean cloth.</p></div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Always Seek Hospital</h4><p>Even if the person seems fine — internal heart rhythm damage can cause delayed collapse. Always get evaluated.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="electric shock current lagna">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon">🌫️</div>
+      <div class="acc-title">Smoke Inhalation</div>
+      <div class="acc-arrow">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Move to Fresh Air</h4><p>Get away from smoke immediately. Stay low — smoke rises. Fresh air is the first treatment.</p></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Loosen Clothing</h4><p>Loosen anything around neck and chest. Sit upright. If unconscious — recovery position and call 112.</p></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Watch for Delayed Symptoms</h4><p>Coughing, hoarse voice, breathing difficulty may worsen hours later. Any smoke inhalation = hospital check.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+</div><!-- /content-area -->
+
+<script>
+function showTab(id, el) {
+  document.querySelectorAll('.topic-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('searchInput').value = '';
+  document.getElementById('noResult').style.display = 'none';
+  // Reset all acc-items display when switching tabs
+  document.querySelectorAll('.acc-item').forEach(i => i.style.display = '');
+}
+
+function toggleAcc(header) {
+  const item = header.parentElement;
+  item.classList.toggle('open');
+}
+
+function doSearch() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  if (!q) {
+    document.querySelectorAll('.acc-item').forEach(i => { i.style.display = ''; i.classList.remove('open'); });
+    document.querySelectorAll('.topic-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('tab-cardiac').classList.add('active');
+    document.querySelectorAll('.tab').forEach((t,i) => { t.classList.remove('active'); if(i===0) t.classList.add('active'); });
+    document.getElementById('noResult').style.display = 'none';
+    return;
+  }
+  // Show all sections, filter items
+  document.querySelectorAll('.topic-section').forEach(s => s.classList.add('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  let found = 0;
+  document.querySelectorAll('.acc-item').forEach(item => {
+    const kw = (item.dataset.keywords || '').toLowerCase();
+    const title = item.querySelector('.acc-title').textContent.toLowerCase();
+    const body = item.querySelector('.acc-body').textContent.toLowerCase();
+    if (kw.includes(q) || title.includes(q) || body.includes(q)) {
+      item.style.display = '';
+      item.classList.add('open');
+      found++;
+    } else {
+      item.style.display = 'none';
+    }
+  });
+  document.getElementById('noResult').style.display = found === 0 ? 'block' : 'none';
+}
+
+// URL parameter-based tab/topic opening — runs after page loads
+window.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const tab = params.get("tab");
+  const topic = params.get("topic");
+
+  if (tab) {
+    document.querySelectorAll(".topic-section").forEach(s => s.classList.remove("active"));
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+
+    const targetSection = document.getElementById("tab-" + tab);
+    if (targetSection) targetSection.classList.add("active");
+
+    document.querySelectorAll(".tab").forEach(button => {
+      const onclick = button.getAttribute("onclick") || "";
+      if (onclick.includes("'" + tab + "'")) button.classList.add("active");
+    });
+  }
+
+  if (topic) {
+    document.querySelectorAll(".acc-item").forEach(item => {
+      const keywords = (item.dataset.keywords || "").toLowerCase();
+      if (keywords.includes(topic.toLowerCase())) {
+        item.classList.add("open");
+        setTimeout(() => {
+          item.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 300);
+      }
+    });
+  }
+});
+</script>
+</body>
+</html>

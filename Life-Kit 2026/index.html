@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>LifeKit — Disclaimer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0c10;
+      --surface: #111418;
+      --card: #161b22;
+      --border: rgba(255,255,255,0.07);
+      --accent: #ff3b3b;
+      --accent2: #ff7c3b;
+      --text: #f0f4f8;
+      --muted: #6b7280;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 0 0 32px;
+    }
+
+    /* Header */
+    .header {
+      padding: 52px 20px 20px;
+      background: rgba(10,12,16,0.95);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .logo-icon { font-size: 26px; }
+
+    .logo-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 4px;
+      background: linear-gradient(135deg, #fff 0%, #ff3b3b 60%, #ff7c3b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .version-tag {
+      background: rgba(255,59,59,0.12);
+      border: 1px solid rgba(255,59,59,0.2);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 10px;
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .header-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Step indicator */
+    .step-row {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      padding: 16px 20px 0;
+    }
+
+    .step-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+
+    .step-dot.done { background: rgba(255,59,59,0.4); }
+    .step-dot.active { background: var(--accent); width: 20px; border-radius: 3px; }
+
+    /* Scroll area */
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 20px 0;
+    }
+
+    .page-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 2px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .page-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    /* Disclaimer cards */
+    .disc-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 12px;
+    }
+
+    .disc-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .disc-icon { font-size: 22px; flex-shrink: 0; }
+
+    .disc-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .disc-tag {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .tag-red { background: rgba(255,59,59,0.12); color: #ff6b6b; border: 1px solid rgba(255,59,59,0.2); }
+    .tag-orange { background: rgba(255,124,59,0.12); color: #ff9a6b; border: 1px solid rgba(255,124,59,0.2); }
+    .tag-blue { background: rgba(59,138,255,0.12); color: #6bb3ff; border: 1px solid rgba(59,138,255,0.2); }
+    .tag-green { background: rgba(59,255,138,0.10); color: #6bffaa; border: 1px solid rgba(59,255,138,0.2); }
+
+    .disc-body {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .disc-body ul {
+      padding-left: 16px;
+      margin-top: 6px;
+    }
+
+    .disc-body li {
+      margin-bottom: 5px;
+    }
+
+    /* Divider */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 8px 0 16px;
+    }
+
+    /* Project note */
+    .project-note {
+      background: rgba(59,138,255,0.06);
+      border: 1px solid rgba(59,138,255,0.15);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .project-note p {
+      font-size: 12px;
+      color: #80b8ff;
+      line-height: 1.6;
+    }
+
+    /* Copyright note */
+    .copyright-note {
+      background: rgba(245,197,24,0.06);
+      border: 1px solid rgba(245,197,24,0.15);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .copyright-note p {
+      font-size: 12px;
+      color: #c8a840;
+      line-height: 1.6;
+    }
+
+    .wi { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* Bottom sticky area */
+    .bottom-area {
+      position: sticky;
+      bottom: 0;
+      background: rgba(10,12,16,0.97);
+      backdrop-filter: blur(14px);
+      padding: 16px 20px 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Checkbox */
+    .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+      cursor: pointer;
+      -webkit-user-select: none;
+    }
+
+    .custom-checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 7px;
+      border: 2px solid var(--border);
+      background: var(--card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+      transition: all 0.2s;
+    }
+
+    .custom-checkbox.checked {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .custom-checkbox .checkmark {
+      color: #fff;
+      font-size: 13px;
+      display: none;
+    }
+
+    .custom-checkbox.checked .checkmark { display: block; }
+
+    .checkbox-label {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .checkbox-label strong { color: var(--text); }
+
+    /* Agree button */
+    .btn-agree {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #ff3b3b, #ff7c3b);
+      border: none;
+      border-radius: 16px;
+      color: #fff;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      box-shadow: 0 6px 24px rgba(255,59,59,0.35);
+      -webkit-user-select: none;
+    }
+
+    .btn-agree:disabled {
+      opacity: 0.25;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-agree:not(:disabled):active { transform: scale(0.97); }
+
+    /* Fade in animation */
+    .disc-card {
+      animation: fadeUp 0.4s ease forwards;
+      opacity: 0;
+    }
+
+    .disc-card:nth-child(1) { animation-delay: 0.1s; }
+    .disc-card:nth-child(2) { animation-delay: 0.18s; }
+    .disc-card:nth-child(3) { animation-delay: 0.26s; }
+    .disc-card:nth-child(4) { animation-delay: 0.34s; }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(16px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo-row">
+      <div class="logo-icon">🛡️</div>
+      <div class="logo-name">LifeKit</div>
+      <div class="version-tag">v1.0</div>
+    </div>
+    <div class="header-sub">By Harshit Group of Technology (HGT)</div>
+  </div>
+
+  <!-- STEP INDICATOR -->
+  <div class="step-row">
+    <div class="step-dot done"></div>
+    <div class="step-dot active"></div>
+    <div class="step-dot"></div>
+  </div>
+
+  <!-- SCROLL CONTENT -->
+  <div class="scroll-area">
+
+    <br>
+    <div class="page-title">Terms & Disclaimer</div>
+    <p class="page-sub">Please read carefully before using LifeKit. Your safety depends on understanding these limitations.</p>
+
+    <!-- Medical Disclaimer -->
+    <div class="disc-card">
+      <div class="disc-card-header">
+        <div class="disc-icon">🩺</div>
+        <div class="disc-title">Medical Disclaimer</div>
+        <div class="disc-tag tag-red">Important</div>
+      </div>
+      <div class="disc-body">
+        The First Aid and health-related content in this app is provided for <strong>general educational purposes only</strong>. It is not a substitute for professional medical advice, diagnosis, or treatment.
+        <ul>
+          <li>Always call <strong>112</strong> in a life-threatening emergency.</li>
+          <li>Content is based on general guidelines and may not apply to every individual situation.</li>
+          <li>Medical conditions vary — consult a trained medical professional for personalized advice.</li>
+          <li>LifeKit and HGT are not responsible for any outcomes resulting from use of this content.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Legal Disclaimer -->
+    <div class="disc-card">
+      <div class="disc-card-header">
+        <div class="disc-icon">⚖️</div>
+        <div class="disc-title">Legal Information Disclaimer</div>
+        <div class="disc-tag tag-orange">Note</div>
+      </div>
+      <div class="disc-body">
+        The "Basic Rights" section contains <strong>general legal awareness information</strong> based on Indian law as of the app's creation date.
+        <ul>
+          <li>This is NOT legal advice. Laws may change over time or vary by state.</li>
+          <li>For any specific legal situation, consult a qualified lawyer or legal aid authority.</li>
+          <li>The creators are not lawyers and are not liable for reliance on this content.</li>
+          <li>Free legal help is available at NALSA: <strong>15100</strong>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- General Disclaimer -->
+    <div class="disc-card">
+      <div class="disc-card-header">
+        <div class="disc-icon">📋</div>
+        <div class="disc-title">General Disclaimer</div>
+        <div class="disc-tag tag-blue">General</div>
+      </div>
+      <div class="disc-body">
+        LifeKit is designed to be a helpful awareness tool — not a replacement for trained professionals.
+        <ul>
+          <li>Emergency numbers and procedures are based on Indian standards.</li>
+          <li>Always prioritize official emergency services over app content in real situations.</li>
+          <li>The app works offline — content reflects information at time of creation.</li>
+          <li>Harshit Group of Technology (HGT) disclaims all liability for direct or indirect damages from app use.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Project Note -->
+    <div class="project-note">
+      <div class="wi">🎓</div>
+      <p><strong>Project Notice:</strong> LifeKit is developed as a student project by Harshit Group of Technology (HGT) for educational and public awareness purposes. It is a non-commercial initiative.</p>
+    </div>
+
+    <!-- Copyright Note -->
+    <div class="copyright-note">
+      <div class="wi">©</div>
+      <p><strong>Copyright:</strong> All content, design, and code in this app is original work created by HGT. Emergency numbers are public domain. Legal provisions cited are from publicly available government sources. Unauthorized reproduction of this app's design or content is prohibited.</p>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM AGREE AREA -->
+  <div class="bottom-area">
+
+    <div class="checkbox-row" onclick="toggleCheck()">
+      <div class="custom-checkbox" id="checkbox">
+        <span class="checkmark">✓</span>
+      </div>
+      <div class="checkbox-label">
+        I have read and understood the above disclaimers. I agree to use LifeKit as an <strong>educational reference only</strong> and will seek professional help in real emergencies.
+      </div>
+    </div>
+
+    <button class="btn-agree" id="agreeBtn" disabled onclick="proceed()">
+      I AGREE — CONTINUE →
+    </button>
+
+  </div>
+
+  <script>
+    let agreed = false;
+
+    function toggleCheck() {
+      agreed = !agreed;
+      const cb = document.getElementById('checkbox');
+      const btn = document.getElementById('agreeBtn');
+      cb.classList.toggle('checked', agreed);
+      btn.disabled = !agreed;
+    }
+
+    function proceed() {
+      if (!agreed) return;
+      // Save agreement with timestamp
+      localStorage.setItem('lifekit_agreed', 'true');
+      localStorage.setItem('lifekit_agreed_date', new Date().toISOString());
+      // Go to onboarding
+      window.location.href = 'frontpage.html';
+    }
+
+    // If already agreed, skip this screen
+    if (localStorage.getItem('lifekit_agreed') === 'true') {
+      window.location.href = 'frontpage.html';
+    }
+  </script>
+
+</body>
+</html>

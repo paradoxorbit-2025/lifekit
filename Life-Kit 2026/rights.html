@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>LifeKit — Basic Rights</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#0a0c10; --surface:#111418; --card:#161b22; --border:rgba(255,255,255,0.07); --accent:#3bff8a; --accent2:#00cc66; --text:#f0f4f8; --muted:#6b7280; }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; padding-bottom:48px; }
+    .top-bar { display:flex; align-items:center; gap:14px; padding:52px 20px 16px; position:sticky; top:0; background:rgba(10,12,16,0.94); backdrop-filter:blur(14px); z-index:100; border-bottom:1px solid var(--border); }
+    .back-btn { width:38px; height:38px; background:var(--card); border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; text-decoration:none; color:var(--text); flex-shrink:0; }
+    .back-btn:active { background:var(--surface); }
+    .top-title { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:2px; color:var(--accent); }
+    .hero { padding:24px 20px 16px; animation:fadeUp 0.5s ease forwards; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+    .hero-label { font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
+    .hero h1 { font-size:26px; font-weight:600; line-height:1.2; margin-bottom:6px; }
+    .hero p { font-size:13px; color:var(--muted); line-height:1.6; }
+    .disclaimer { margin:0 20px 16px; background:rgba(59,255,138,0.06); border:1px solid rgba(59,255,138,0.2); border-radius:14px; padding:12px 14px; display:flex; gap:10px; }
+    .disclaimer p { font-size:11px; color:#6b9e7a; line-height:1.5; }
+    .search-wrap { padding:0 20px 14px; }
+    .search-box { background:var(--card); border:1px solid var(--border); border-radius:14px; display:flex; align-items:center; gap:10px; padding:12px 16px; }
+    .search-box span { font-size:15px; opacity:0.4; }
+    .search-box input { background:none; border:none; outline:none; color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; flex:1; }
+    .search-box input::placeholder { color:var(--muted); }
+    .tabs-wrap { overflow-x:auto; padding:0 20px 4px; scrollbar-width:none; }
+    .tabs-wrap::-webkit-scrollbar { display:none; }
+    .tabs { display:flex; gap:8px; width:max-content; }
+    .tab { padding:8px 14px; border-radius:20px; border:1px solid var(--border); background:var(--card); font-size:12px; font-weight:500; color:var(--muted); cursor:pointer; white-space:nowrap; transition:all 0.2s; -webkit-user-select:none; }
+    .tab.active { background:var(--accent); border-color:var(--accent); color:#000; }
+    .content-area { padding:16px 20px; }
+    .topic-section { display:none; }
+    .topic-section.active { display:block; animation:fadeUp 0.3s ease; }
+    .accordion { display:flex; flex-direction:column; gap:10px; }
+    .acc-item { background:var(--card); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+    .acc-header { display:flex; align-items:center; gap:12px; padding:16px; cursor:pointer; -webkit-user-select:none; }
+    .acc-header:active { background:rgba(255,255,255,0.03); }
+    .acc-icon { font-size:22px; flex-shrink:0; }
+    .acc-title { font-size:15px; font-weight:600; flex:1; }
+    .acc-arrow { font-size:12px; color:var(--muted); transition:transform 0.25s; flex-shrink:0; }
+    .acc-item.open .acc-arrow { transform:rotate(180deg); }
+    .acc-body { display:none; padding:0 16px 16px; }
+    .acc-item.open .acc-body { display:block; animation:fadeUp 0.25s ease; }
+    .steps { display:flex; flex-direction:column; gap:10px; margin-top:4px; }
+    .step { display:flex; gap:12px; align-items:flex-start; background:rgba(59,255,138,0.04); border:1px solid rgba(59,255,138,0.1); border-radius:12px; padding:12px; }
+    .step-n { width:26px; height:26px; border-radius:50%; background:rgba(59,255,138,0.12); border:1px solid rgba(59,255,138,0.25); color:var(--accent); font-family:'Bebas Neue',sans-serif; font-size:13px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .step-c h4 { font-size:14px; font-weight:600; margin-bottom:3px; }
+    .step-c p { font-size:12px; color:var(--muted); line-height:1.5; }
+    .law-tag { display:inline-block; background:rgba(59,255,138,0.1); border:1px solid rgba(59,255,138,0.2); border-radius:6px; padding:2px 8px; font-size:10px; color:var(--accent); font-weight:600; margin-bottom:6px; letter-spacing:0.5px; }
+    .warn { background:rgba(255,59,59,0.07); border:1px solid rgba(255,59,59,0.2); border-radius:12px; padding:12px 14px; margin-top:12px; display:flex; gap:10px; align-items:flex-start; }
+    .warn p { font-size:12px; color:#ff8080; line-height:1.5; }
+    .tip { background:rgba(59,138,255,0.07); border:1px solid rgba(59,138,255,0.2); border-radius:12px; padding:12px 14px; margin-top:10px; display:flex; gap:10px; align-items:flex-start; }
+    .tip p { font-size:12px; color:#80b8ff; line-height:1.5; }
+    .wi { font-size:16px; flex-shrink:0; }
+    .no-result { text-align:center; padding:40px 20px; color:var(--muted); font-size:14px; display:none; }
+  </style>
+</head>
+<body>
+<div class="top-bar">
+  <a class="back-btn" href="frontpage.html">←</a>
+  <div class="top-title">⚖️ Basic Rights</div>
+</div>
+<div class="hero">
+  <div class="hero-label">Know Your Rights</div>
+  <h1>Basic Human<br>Rights — India</h1>
+  <p>Your legal rights as an Indian citizen. Know them. Use them. Protect them.</p>
+</div>
+<div class="disclaimer">
+  <div class="wi">ℹ️</div>
+  <p>This is general awareness information, not legal advice. For specific situations, always consult a qualified lawyer.</p>
+</div>
+<div class="search-wrap">
+  <div class="search-box">
+    <span>🔍</span>
+    <input type="text" id="searchInput" placeholder="Search... e.g. arrest, FIR, RTI, bail" oninput="doSearch()" />
+  </div>
+</div>
+<div class="tabs-wrap">
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('fundamental',this)">📜 Fundamental</div>
+    <div class="tab" onclick="showTab('police',this)">👮 Police & Law</div>
+    <div class="tab" onclick="showTab('consumer',this)">🛒 Consumer</div>
+    <div class="tab" onclick="showTab('social',this)">🤝 Social</div>
+    <div class="tab" onclick="showTab('labor',this)">⚙️ Labor</div>
+    <div class="tab" onclick="showTab('digital',this)">📱 Digital</div>
+    <div class="tab" onclick="showTab('special',this)">♿ Special Groups</div>
+  </div>
+</div>
+<div class="content-area">
+<div class="no-result" id="noResult">No topics found. Try a different keyword.</div>
+
+<!-- FUNDAMENTAL -->
+<div class="topic-section active" id="tab-fundamental">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="right to equality discrimination caste religion gender">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">⚖️</div><div class="acc-title">Right to Equality</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">Article 14–18</div><h4>What It Means</h4><p>Every Indian citizen is equal before the law. No one can be discriminated against based on religion, caste, sex, place of birth, or race — in government services, public places, or employment.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>What You Can Do</h4><p>If denied service or discriminated in public place — file complaint with District Magistrate, Human Rights Commission, or NHRC (nhrc.nic.in).</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="freedom speech expression opinion press">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🗣️</div><div class="acc-title">Right to Freedom of Speech</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">Article 19(1)(a)</div><h4>What It Means</h4><p>You have the right to express opinions, criticize government, protest peacefully, and speak freely — subject to reasonable restrictions on public order and decency.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Limits</h4><p>Hate speech, incitement to violence, and defamation are not protected. Free speech does not include harassing individuals.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="right education rte children 6 14 free school">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">📚</div><div class="acc-title">Right to Education (RTE)</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">Article 21A + RTE Act 2009</div><h4>What It Means</h4><p>Every child aged 6–14 has the right to free and compulsory education in a government school. No school can deny admission, charge fees, or expel a child in this age group.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>25% Reservation</h4><p>Private schools must reserve 25% seats for economically weaker sections (EWS). Apply through state RTE portal — it's free.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>If Denied</h4><p>Complain to Block Education Officer or District Magistrate. School can face heavy penalties for refusing admission.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="right life personal liberty article 21">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🛡️</div><div class="acc-title">Right to Life & Personal Liberty</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">Article 21</div><h4>Most Powerful Right</h4><p>Article 21 is the broadest fundamental right — it includes right to live with dignity, right to privacy, right to education, right to health, and protection from arbitrary state action.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Medical Emergency</h4><p>Under Article 21, NO hospital — government or private — can deny emergency medical treatment due to inability to pay. Treatment first, payment later.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Enforce It</h4><p>If Article 21 is violated — file a Writ Petition directly in High Court. This right is directly enforceable against the State.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="freedom religion pray worship dharma">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🕌</div><div class="acc-title">Freedom of Religion</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">Article 25–28</div><h4>What It Means</h4><p>Every person has the right to freely profess, practice, and propagate any religion. No one can be forced to pay taxes for promotion of another religion.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Limits</h4><p>Religious practices that endanger public order, morality, or health are not protected. Forcible conversion is illegal in several states.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="environmental right clean water pollution air">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🌿</div><div class="acc-title">Right to Clean Environment</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">Article 21 + Article 48A</div><h4>What It Means</h4><p>Supreme Court has held that right to clean environment, clean water, and pollution-free air is part of the Right to Life under Article 21.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>How to Complain</h4><p>Pollution complaints: National Green Tribunal (NGT) at ngtnational.in — free to file. No lawyer needed for basic complaints. NGT has strong powers to fine industries.</p></div></div>
+    </div></div>
+  </div>
+
+</div>
+</div>
+
+<!-- POLICE & LAW -->
+<div class="topic-section" id="tab-police">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="arrest rights illegal 24 hours magistrate warrant">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">👮</div><div class="acc-title">Rights Against Illegal Arrest</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">Article 22 + BNSS 2023</div><h4>Your 5 Core Rights on Arrest</h4><p>1. Right to know reason for arrest. 2. Right to be produced before Magistrate within 24 hours. 3. Right to inform a family member/friend. 4. Right to remain silent. 5. Right to a lawyer immediately.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>If Illegally Detained</h4><p>File Habeas Corpus petition in High Court — fastest legal remedy to secure release from illegal detention. Any citizen can file it.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Warrantless Arrest</h4><p>Police can arrest without warrant for cognizable offences (serious crimes). For non-cognizable offences — they must get a warrant from Magistrate first.</p></div></div>
+    </div>
+    <div class="warn"><div class="wi">⚠️</div><p>If police refuse to inform your family or allow lawyer access — that's a violation of your fundamental rights. Remember: you can stay silent until your lawyer arrives.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="right to silence police interrogation statement">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🤐</div><div class="acc-title">Right to Silence</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">Article 20(3)</div><h4>No Self-Incrimination</h4><p>You cannot be compelled to be a witness against yourself. You have the right to refuse to answer questions that may incriminate you.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>How to Use It</h4><p>Simply say: "I exercise my right to remain silent and wish to speak to a lawyer." You don't need to explain further. Don't sign any statement without lawyer present.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Confession to Police is Not Evidence</h4><p>Under Indian law, a confession made to a police officer is NOT admissible as evidence. Only confessions to a Magistrate are valid.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="fir filing right police refuse first information report">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">📋</div><div class="acc-title">FIR Filing Rights</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Police MUST Register FIR</h4><p>For cognizable offences (theft, rape, murder, fraud), police are legally obligated to register FIR immediately. They cannot refuse or ask you to come back later.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>If Police Refuse</h4><p>Send a written complaint by speed post to Superintendent of Police (SP). If still refused — file complaint directly before Magistrate under Section 175 BNSS.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Online FIR</h4><p>Most states allow online FIR for certain offences. Check your state police website. Also file cybercrime at cybercrime.gov.in.</p></div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Get FIR Copy Free</h4><p>You have the right to receive a free copy of your FIR immediately upon registration. Police cannot charge any fee for this.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="bail rights custody pretrial non-bailable">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🔓</div><div class="acc-title">Right to Bail</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Bailable Offences</h4><p>You have a right to bail as a matter of right for bailable offences. Police cannot deny bail for minor offences — it's mandatory.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Non-Bailable Offences</h4><p>Bail is at court's discretion. Apply to Sessions Court if Magistrate refuses. High Court has power to grant bail in all cases.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Default Bail</h4><p>If police don't file chargesheet within 60–90 days of arrest (depending on offence), you have a statutory right to bail — courts must grant it.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="illegal search home warrant police raid privacy">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🏠</div><div class="acc-title">Right Against Illegal Search</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Search Warrant Required</h4><p>Police cannot search your home without a search warrant from a Magistrate — except in specific urgent circumstances (hot pursuit, etc.).</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Demand to See Warrant</h4><p>Ask to see the warrant before allowing entry. Note the warrant number, issuing Magistrate, and scope of search.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Witness Your Search</h4><p>During search — two independent witnesses (panchas) must be present. Demand a copy of the seizure memo for everything taken.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="free legal aid lawyer government poor vakil">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">⚖️</div><div class="acc-title">Right to Free Legal Aid</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">Article 39A + Legal Services Authorities Act</div><h4>Who Gets Free Legal Aid</h4><p>Women, children, SC/ST, persons with disabilities, victims of trafficking, those with annual income below ₹3 lakh — are entitled to free government lawyer.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>How to Get It</h4><p>Contact District Legal Services Authority (DLSA) in your district. Every court also has a Legal Aid desk — walk in and ask. It's completely free.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>NALSA Helpline</h4><p>National Legal Services Authority: Call 15100 (free) for legal help. They provide lawyers, mediation, and guidance.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="torture police custody violence third degree illegal">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🚫</div><div class="acc-title">Protection Against Torture & Custodial Violence</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">Article 21 + IPC Sections</div><h4>Custodial Violence is Illegal</h4><p>Any physical or mental torture in police or judicial custody is illegal. Police officers who commit it face criminal charges and departmental action.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>How to Complain</h4><p>File complaint with: NHRC (nhrc.nic.in | 14433), State Human Rights Commission, or SP of District. You can also petition High Court directly.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Medical Exam Right</h4><p>Any person in custody has the right to be medically examined — especially after alleging violence. Demand this right loudly and clearly.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="right speedy trial case delay court justice">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">⏱️</div><div class="acc-title">Right to Speedy Trial</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">Article 21 — SC Interpretation</div><h4>What It Means</h4><p>Supreme Court has held that unreasonable delay in trial violates Article 21. You can apply to High Court for expedited trial or bail if case is delayed without reason.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Undertrial Rights</h4><p>If you've been in jail as undertrial for half the maximum sentence for the alleged offence — you have the right to bail under Section 479 BNSS.</p></div></div>
+    </div></div>
+  </div>
+
+</div>
+</div>
+
+<!-- CONSUMER -->
+<div class="topic-section" id="tab-consumer">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="consumer rights complaint court product defect fraud refund">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🛒</div><div class="acc-title">Consumer Rights</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">Consumer Protection Act 2019</div><h4>Your 6 Consumer Rights</h4><p>1. Right to Safety. 2. Right to Information. 3. Right to Choose. 4. Right to be Heard. 5. Right to Redressal. 6. Right to Consumer Education.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>File a Complaint</h4><p>Online at consumerhelpline.gov.in or call 1915 (National Consumer Helpline). For claims under ₹50 lakh: District Consumer Commission. Free to file, no lawyer mandatory.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>E-Commerce Rights</h4><p>Online sellers must display all charges upfront. No hidden charges. Return and refund policies must be clearly stated. You can complain to NCH for online fraud too.</p></div></div>
+    </div>
+    <div class="tip"><div class="wi">💡</div><p>Always keep bills, warranty cards, and screenshots of online orders. These are your evidence in consumer court.</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="medical right hospital emergency treatment deny">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🏥</div><div class="acc-title">Right to Medical Care</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>No Emergency Denial</h4><p>NO hospital — government or private — can deny emergency medical treatment. Demanding payment before treatment in emergency = illegal. Treat first, pay later.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Right to Information</h4><p>You have the right to know your diagnosis, treatment options, risks, and alternatives in language you understand before giving consent.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Medical Records</h4><p>You have the right to receive copies of all your medical records, test reports, and discharge summary. Hospitals cannot refuse this.</p></div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-c"><h4>Complaint for Medical Negligence</h4><p>File with State Medical Council, National Medical Commission (nmc.org.in), or Consumer Court for compensation.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="tenant rights rental house eviction notice landlord kirayedari">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🏘️</div><div class="acc-title">Tenant Rights (Kirayedari Adhikar)</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>No Arbitrary Eviction</h4><p>Landlord cannot evict you without proper legal notice and reason. Most state tenancy laws require 1–3 months notice. Forced eviction without court order is illegal.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Rent Agreement is Key</h4><p>Always get a written and registered rent agreement. Unregistered agreements still have legal value as evidence but registered ones are stronger.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Security Deposit</h4><p>Landlord must return security deposit within 30 days of vacating (with deductions for legitimate damage). Document condition of house on move-in with photos.</p></div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-c"><h4>If Harassed</h4><p>Cutting off water/electricity to force eviction is illegal. File complaint with Rent Control Court or District Magistrate.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="RTI right to information government file application">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">📄</div><div class="acc-title">Right to Information (RTI)</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">RTI Act 2005</div><h4>What You Can Ask</h4><p>Any citizen can ask any government department for any public information. Why your application is delayed, government expenses, tender details, officer's qualifications — anything.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>How to File</h4><p>Online at rtionline.gov.in — ₹10 application fee. Reply must come within 30 days. Free for BPL card holders. No need for lawyer or reason.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>If Denied</h4><p>File First Appeal with senior officer within 30 days. Then Second Appeal with Central/State Information Commissioner. Penalty for delay: ₹250/day on the officer.</p></div></div>
+    </div>
+    <div class="tip"><div class="wi">💡</div><p>RTI is one of the most powerful tools against corruption. Use it freely — officers are legally bound to respond.</p></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SOCIAL -->
+<div class="topic-section" id="tab-social">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="women rights domestic violence maternity equal pay">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">👩</div><div class="acc-title">Women's Legal Rights</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">PWDVA 2005 + IPC 498A + POSH Act</div><h4>Domestic Violence</h4><p>Domestic violence includes physical, emotional, sexual, and economic abuse. File complaint with Protection Officer (in every district) or directly at police station. Shelter homes available.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Maternity Benefits</h4><p>Maternity Benefit Act: 26 weeks paid leave for first 2 children, 12 weeks for third. Cannot be dismissed during pregnancy. Right to work from home after return.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Workplace Harassment (POSH)</h4><p>Every workplace must have Internal Complaints Committee. File complaint within 3 months of incident. Employer must act within 60 days. Confidentiality is mandatory.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Equal Pay</h4><p>Equal Remuneration Act: women must receive same pay as men for same work. Any discrimination is punishable.</p></div></div>
+    </div>
+    <div class="tip"><div class="wi">💡</div><p>Women's Helpline: 181 | Domestic Violence: 181 | NCW Helpline: 7827-170-170</p></div>
+    </div>
+  </div>
+
+  <div class="acc-item" data-keywords="senior citizens elderly rights maintenance protection parents">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">👴</div><div class="acc-title">Rights of Senior Citizens</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">Maintenance & Welfare of Parents Act 2007</div><h4>Maintenance from Children</h4><p>Children (including adopted) are legally obligated to maintain parents and grandparents above 60 years who cannot support themselves. Court can order monthly maintenance.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Property Transfer Reversal</h4><p>If a senior citizen transferred property to children who later neglect them — the transfer can be revoked by Maintenance Tribunal.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Elder Helpline</h4><p>National Elder Helpline: 14567 (free). State-run helplines provide legal aid, counseling, and emergency support.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="transgender rights identity gender discrimination NALSA">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🏳️‍⚧️</div><div class="acc-title">Rights of Transgender Persons</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">Transgender Persons (Protection of Rights) Act 2019</div><h4>Key Rights</h4><p>Right to self-perceived gender identity. Right to non-discrimination in education, employment, healthcare, housing, and public services.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Identity Certificate</h4><p>Apply for Transgender Identity Certificate through District Magistrate — enables legal recognition for all government documents.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Complaint</h4><p>Discrimination complaints to National Council for Transgender Persons. Employment discrimination also covered under workplace laws.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="voter right vote election adult suffrage pressure">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🗳️</div><div class="acc-title">Right to Vote — Adult Suffrage</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Secret Ballot is Absolute</h4><p>No one — not employer, family, party worker — can legally compel you to reveal who you voted for or force you to vote a certain way. Your vote is completely secret.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Vote Without Fear</h4><p>Threatening or bribing a voter is a criminal offence. Report electoral violations to 1950 (ECI helpline) or local Returning Officer.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>NOTA Option</h4><p>You can choose NOTA (None of the Above) if you don't want to vote for any candidate. This is a valid and protected choice.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="prisoners jail rights medicine food custody">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🔒</div><div class="acc-title">Rights of Prisoners</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Basic Rights Remain</h4><p>Imprisonment restricts liberty — not all rights. Prisoners retain rights to life with dignity, medical care, food, and protection from torture.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Right to Meet Lawyer</h4><p>Prisoners have the right to consult a lawyer at any reasonable time. Jailor cannot permanently block lawyer access.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Parole & Furlough</h4><p>Convicted prisoners are entitled to temporary release (parole for emergency, furlough for maintaining social ties) subject to rules.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="whistleblower protection corruption expose identity">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🔔</div><div class="acc-title">Whistleblower Protection</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">Whistle Blowers Protection Act 2014</div><h4>Protection for Exposing Corruption</h4><p>If you expose corruption by a government employee or department — your identity is protected. Victimization of whistleblowers is illegal.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>How to Report</h4><p>File complaint with Central Vigilance Commission (cvc.gov.in) or Anti-Corruption Bureau of your state. You can file anonymously.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="animal rights cruelty PCA act IPC 428 429">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🐾</div><div class="acc-title">Animal Rights & Cruelty Laws</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">Prevention of Cruelty to Animals Act 1960</div><h4>What's Illegal</h4><p>Beating, kicking, torturing, abandoning, working sick animals, or fighting animals for entertainment — all are criminal offences with fines and imprisonment.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Report Animal Cruelty</h4><p>Call local SPCA or PFA. File FIR under PCA Act 1960 + IPC 428/429. AWBI (Animal Welfare Board of India) can be contacted at awbi.in.</p></div></div>
+    </div></div>
+  </div>
+
+</div>
+</div>
+
+<!-- LABOR -->
+<div class="topic-section" id="tab-labor">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="labor rights minimum wage working hours overtime employment">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">⚙️</div><div class="acc-title">Labour Rights & Minimum Wage</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">Minimum Wages Act + Code on Wages 2019</div><h4>Minimum Wage</h4><p>Every employer must pay at least the minimum wage set by state/central government for your category of work. Check your state's current minimum wage at labour.gov.in.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Working Hours</h4><p>Maximum 48 hours/week, 9 hours/day. Overtime must be paid at double rate. Rest of minimum 30 minutes after 5 hours of work.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>If Not Paid</h4><p>File complaint with Labour Commissioner of your district. They have powers to recover unpaid wages. No fee required to file.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="pf epf provident fund gratuity employee benefits">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">💰</div><div class="acc-title">PF, Gratuity & Employee Benefits</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Provident Fund (PF)</h4><p>Every employer with 20+ employees must contribute to EPF. Both employer and employee contribute 12% of basic salary. Check your UAN on epfindia.gov.in.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Gratuity</h4><p>After 5 years of continuous service — you're entitled to gratuity (15 days salary × years of service). Cannot be denied on resignation or retirement.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Unlawful Termination</h4><p>If terminated without valid reason or without 1 month notice (or pay in lieu) — you can file complaint with Labour Court for reinstatement or compensation.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="maternity benefit pregnancy leave working woman">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🤱</div><div class="acc-title">Maternity Benefit Act</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">Maternity Benefit (Amendment) Act 2017</div><h4>Leave Entitlement</h4><p>26 weeks paid maternity leave for first 2 children. 12 weeks for 3rd child. Applies to establishments with 10+ employees. Medical bonus also payable if no prenatal care provided.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Cannot Be Dismissed</h4><p>Employer cannot dismiss or give notice of dismissal during maternity leave. Doing so is illegal and punishable.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Work From Home</h4><p>After maternity leave, employee can request work-from-home arrangements. Employer must consider it in good faith.</p></div></div>
+    </div></div>
+  </div>
+
+</div>
+</div>
+
+<!-- DIGITAL -->
+<div class="topic-section" id="tab-digital">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="right to privacy personal data DPDP digital information">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🔐</div><div class="acc-title">Right to Privacy & Data Protection</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">Article 21 + DPDP Act 2023</div><h4>Privacy as Fundamental Right</h4><p>Supreme Court ruled (2017) that privacy is a fundamental right. The Digital Personal Data Protection Act 2023 now gives you specific digital rights.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Your Data Rights</h4><p>Right to know what data is collected. Right to correction of wrong data. Right to erase your data (right to be forgotten). Right to withdraw consent.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Data Breach</h4><p>If a company suffers a data breach affecting you — they must notify you. You can complain to Data Protection Board if your rights are violated.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="right to be forgotten internet google photo remove old data">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">🗑️</div><div class="acc-title">Right to Be Forgotten — Internet</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>What It Covers</h4><p>You can request removal of personal data, old photos, or private information from Google search results and certain platforms when it's outdated, irrelevant, or violates privacy.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Google Removal</h4><p>Use Google's "Results About You" tool to flag personal info. Submit removal request at support.google.com/websearch.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Non-Consensual Images</h4><p>Intimate images shared without consent: Google, Meta, Microsoft have specific takedown tools. Also complain to cybercrime.gov.in — it's a criminal offence under IT Act.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="IT act cyber crime social media arrest section 66A speech">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">💻</div><div class="acc-title">IT Act & Social Media Rights</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>Section 66A is Dead</h4><p>The infamous Section 66A (arrest for "offensive" social media posts) was struck down by Supreme Court in 2015. Police cannot arrest you under this section — it no longer exists.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>Online Defamation</h4><p>False statements that damage reputation online are actionable. But opinion, satire, and fair comment are protected speech.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Platform Accountability</h4><p>Social media platforms with 5M+ Indian users must appoint a Grievance Officer. Complain to them for content removal. Escalate to cybercrime.gov.in if needed.</p></div></div>
+    </div></div>
+  </div>
+
+</div>
+</div>
+
+<!-- SPECIAL GROUPS -->
+<div class="topic-section" id="tab-special">
+<div class="accordion">
+
+  <div class="acc-item" data-keywords="disability rights PwD divyang reservation ramp accessibility">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">♿</div><div class="acc-title">Rights of Persons with Disabilities (PwD)</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">Rights of Persons with Disabilities Act 2016</div><h4>Recognition</h4><p>21 types of disabilities are legally recognized — including autism, cerebral palsy, mental illness, acid attack victims, and more.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Reservation</h4><p>4% reservation in government jobs. 5% reservation in higher education. Priority in government housing. Free travel in some states.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Accessibility Rights</h4><p>All public buildings, transport, and websites must be made accessible. Non-compliance is punishable. Complain to Chief Commissioner for Persons with Disabilities.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>UDID Card</h4><p>Apply for Unique Disability ID (UDID) at swavlambancard.gov.in — single card for all disability certificates and benefits across India.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="SC ST rights atrocities scheduled caste tribe discrimination">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">⚖️</div><div class="acc-title">SC/ST Rights & Atrocities Act</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">📜</div><div class="step-c"><div class="law-tag">SC/ST (Prevention of Atrocities) Act 1989</div><h4>Strong Legal Protection</h4><p>Specific offences against SC/ST members (abuse, forced labor, public humiliation, dispossession from land) carry strict punishment. Non-bailable offences — immediate FIR mandatory.</p></div></div>
+      <div class="step"><div class="step-n">✓</div><div class="step-c"><h4>Special Courts</h4><p>Atrocity cases are tried in designated Special Courts for faster justice. Victim is entitled to relief and rehabilitation from state even before trial completes.</p></div></div>
+    </div></div>
+  </div>
+
+  <div class="acc-item" data-keywords="child rights POCSO minor protection education labour">
+    <div class="acc-header" onclick="toggleAcc(this)"><div class="acc-icon">👶</div><div class="acc-title">Child Rights</div><div class="acc-arrow">▼</div></div>
+    <div class="acc-body"><div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-c"><h4>No Child Labour</h4><p>Children under 14 cannot be employed in any occupation. Children 14–18 cannot work in hazardous industries. Violation: fine + imprisonment for employer.</p></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-c"><h4>POCSO Protection</h4><p>Any sexual act with person under 18 is punishable under POCSO — regardless of consent. Penalty: 7 years to life. Report to police or Childline 1098.</p></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-c"><h4>Child Helpline</h4><p>Childline: 1098 (free, 24/7) for any child in need — abuse, missing, runaway, labour. NCPCR (National Commission for Protection of Child Rights): ncpcr.gov.in</p></div></div>
+    </div></div>
+  </div>
+
+</div>
+</div>
+
+</div>
+<script>
+function showTab(id, el) {
+  document.querySelectorAll('.acc-item').forEach(i => { i.style.display = ''; i.classList.remove('open'); });
+  document.querySelectorAll('.topic-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('searchInput').value = '';
+  document.getElementById('noResult').style.display = 'none';
+}
+function toggleAcc(header) { header.parentElement.classList.toggle('open'); }
+function doSearch() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  if (!q) {
+    document.querySelectorAll('.acc-item').forEach(i => { i.style.display = ''; i.classList.remove('open'); });
+    document.querySelectorAll('.topic-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('tab-fundamental').classList.add('active');
+    document.querySelectorAll('.tab').forEach((t,i) => { t.classList.remove('active'); if(i===0) t.classList.add('active'); });
+    document.getElementById('noResult').style.display = 'none';
+    return;
+  }
+  document.querySelectorAll('.topic-section').forEach(s => s.classList.add('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  let found = 0;
+  document.querySelectorAll('.acc-item').forEach(item => {
+    const kw = (item.dataset.keywords||'').toLowerCase();
+    const title = item.querySelector('.acc-title').textContent.toLowerCase();
+    const body = item.querySelector('.acc-body').textContent.toLowerCase();
+    if (kw.includes(q)||title.includes(q)||body.includes(q)) { item.style.display=''; item.classList.add('open'); found++; }
+    else { item.style.display='none'; }
+  });
+  document.getElementById('noResult').style.display = found===0 ? 'block' : 'none';
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const tab = params.get("tab");
+  if (tab) {
+    const targetSection = document.getElementById("tab-" + tab);
+    if (targetSection) {
+      document.querySelectorAll(".topic-section").forEach(s => s.classList.remove("active"));
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      targetSection.classList.add("active");
+      document.querySelectorAll(".tab").forEach(btn => {
+        const oc = btn.getAttribute("onclick") || "";
+        if (oc.includes("'" + tab + "'")) btn.classList.add("active");
+      });
+    }
+  }
+});
+</script>
+</body>
+</html>
